@@ -15,9 +15,10 @@
     {% endblock %}
 </head>
 <body>
+<header>
   <nav class="teal lighten-1">
     <div class="nav-wrapper">
-        <a href="#!" class="brand-logo">LGBT Reddit Scraper</a>
+        <a href="/" class="brand-logo">LGBT Reddit Scraper</a>
         <ul class="right">               
             <li>    
                <div class="center row">
@@ -36,8 +37,21 @@
         </ul>
     </div>
   </nav>
+  </header>
+  <main>
   <div id="content" class="content">{% block content %}{% endblock %}</div>
-    <!-- Compiled and minified JavaScript -->
-  <div id="footer">{% block footer %}{% endblock %}</div>
+  </main>
+          <footer class="page-footer teal lighten-1">
+          <div class="footer-copyright">
+            <div class="container">
+            © 2020 Copyright by Lena "Teekeks" During |
+            <a class="grey-text text-lighten-3" href="https://teawork.de">Website</a> |
+            <a class="grey-text text-lighten-3" href="https://reddit.com/u/Teekeks">Reddit</a> |
+            <a class="grey-text text-lighten-3" href="https://github.com/Teekeks/">Github</a> |
+            <a class="grey-text text-lighten-3" href="https://twitter.com/Teekeks">Twitter</a>
+            <a href="/config/" class="grey-text text-lighten-3 right" >View config</a>
+            </div>
+          </div>
+        </footer>
 </body>
 </html>
