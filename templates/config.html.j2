@@ -1,0 +1,38 @@
+{% extends "base.html.j2" %}
+
+{% block content %}
+
+	<div class="row">
+		<div class="col s12">
+			<h5 class="center"><a href="https://reddit.com/u/Teekeks/" target="__blank">Scraper by /u/Teekeks</a></h5>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col m6">
+			<ul class="collection with-header">
+				<li class="collection-header green"><b>LGBT+ Content Subreddits</b></li>
+				{% for sub in lgbt_subs %}
+					<li class="collection-item green lighten-3 avatar">
+						<i class="material-icons circle green lighten-1">bookmark</i>
+						<span class="title"><b>/r/{{ sub }}</b></span>
+						<a href="https://reddit.com/r/{{ sub }}" class="secondary-content" target="__blank"><i class="material-icons">share</i></a>
+					</li>
+				{% endfor %}
+				
+			</ul>
+		</div>
+		<div class="col m6">
+			<ul class="collection with-header">
+				<li class="collection-header red"><b>Red flag Content Subreddits</b></li>
+				{% for sub in flag_subs %}
+					<li class="collection-item red lighten-3 avatar">
+						<i class="material-icons circle red lighten-1">bookmark</i>
+						<span class="title"><b>/r/{{ sub }}</b></span>
+						<a href="https://reddit.com/r/{{ sub }}" class="secondary-content" target="__blank"><i class="material-icons">share</i></a>
+					</li>
+				{% endfor %}
+				
+			</ul>
+		</div>
+	</div>
+{% endblock %}

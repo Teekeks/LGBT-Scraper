@@ -88,9 +88,17 @@ async def handle_home(request):
     return data
 
 
+@aiohttp_jinja2.template('config.html.j2')
+async def handle_show_settings(request):
+    return {
+        "lgbt_subs": lgbt_subs,
+        "flag_subs": bad_subs
+    }
+
 app = web.Application()
 aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('templates'))
-app.add_routes([web.get('/', handle_home)])
+app.add_routes([web.get('/', handle_home),
+                web.get('/config/', handle_show_settings)])
 app.router.add_static('/static/',
                       path=str(path.join(path.dirname(__file__), 'static/')),
                       name='static')
