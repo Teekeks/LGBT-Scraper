@@ -1,0 +1,64 @@
+{% extends "base.html.j2" %}
+
+{% block content %}
+{% if error is defined %}
+	<div class="row">
+		<div class="col s12">
+			<div class="card red darken-1">
+				<div class="card-content white-text">
+					<span class="card-title">Error</span>
+					<p>User not found</p>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endif %}
+
+{% if user is defined %}
+	<div class="row">
+		<div class="col s12">
+			<h5 class="center"><a href="https://reddit.com/u/{{ user.name }}/" target="__blank">{{ user.name }}</a></h5>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col s12">
+			<ul class="collection">
+				<li class="collection-item">Comment Karma: {{ user.comment_karma }}</li>
+				<li class="collection-item">Link Karma: {{ user.link_karma }}</li>
+				<li class="collection-item">Scraped Comments: {{ comment_count }}</li>
+				<li class="collection-item">Scraped Posts: {{ post_count }}</li>
+				<li class="collection-item">LGBT+ Content: {{ user.good|length }}</li>
+				<li class="collection-item">Red flag Content: {{ user.flag|length }}</li>
+			</ul>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col m6">
+			<ul class="collection with-header">
+				<li class="collection-header green"><b>LGBT+ Content</b></li>
+				{% for comment in user.good %}
+					<li class="collection-item green lighten-3 avatar">
+						<i class="material-icons circle green lighten-1">{% if comment.type == 'comment' %}comment{% else %}email{% endif %}</i>
+						<span class="title"><b>{{ comment.title }}</b><br/>
+							<b>/r/{{ comment.sub }}</b> | Score: {{ comment.score }}</span>
+						<p>{{ comment.body }}</p>
+						<a href="{{ comment.url }}" class="secondary-content" target="__blank"><i class="material-icons">share</i></a>
+					</li>
+				{% endfor %}
+		</div>
+		<div class="col m6">
+			<ul class="collection with-header">
+				<li class="collection-header red"><b>Red flag Content</b></li>
+				{% for comment in user.flag %}
+					<li class="collection-item red lighten-3 avatar">
+						<i class="material-icons circle red lighten-1">{% if comment.type == 'comment' %}comment{% else %}email{% endif %}</i>
+						<span class="title"><b>{{ comment.title }}</b><br/>
+							<b>/r/{{ comment.sub }}</b> | Score: {{ comment.score }}</span>
+						<p>{{ comment.body }}</p>
+						<a href="{{ comment.url }}" class="secondary-content" target="__blank"><i class="material-icons">share</i></a>
+					</li>
+				{% endfor %}
+		</div>
+	</div>
+{% endif %}
+{% endblock %}

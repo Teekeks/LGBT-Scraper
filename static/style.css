@@ -1,0 +1,19 @@
+img.useravatar {
+	width: 32px;
+	height: 32px;
+	border-radius: 100%;
+	vertical-align: middle;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #999;
+}
+
+#topbarsearch .input-field .prefix { 
+	width:0rem !important;    
+}        
+#topbarsearch nav ul li:hover, nav ul li.active {
+    background-color: none !important;
+}
+.input-field .prefix ~ input, .input-field .prefix ~ textarea, .input-field .prefix ~ label, .input-field .prefix ~ .validate ~ label, .input-field .prefix ~ .autocomplete-content{
+	margin-left: 1rem !important;
+}
