@@ -32,6 +32,26 @@ async def handle_home(request):
             u.id
         except NotFound:
             return {'error': 'no_user'}
+        usr = {
+            'name': u.name,
+            'comment_karma': u.comment_karma,
+            'link_karma': u.link_karma
+        }
+        data['user'] = usr
+    return data
+
+
+@aiohttp_jinja2.template('list.html.j2')
+async def handle_load_list(request):
+    data = {}
+    username = request.rel_url.query.get('u')
+    if username is not None:
+        username = username.strip()
+        u = reddit.redditor(username)
+        try:
+            u.id
+        except NotFound:
+            return {'error': 'no_user'}
         from pprint import pprint
 
         c_lgbt = []
@@ -87,7 +107,6 @@ async def handle_home(request):
         data['post_count'] = p_t
     return data
 
-
 @aiohttp_jinja2.template('config.html.j2')
 async def handle_show_settings(request):
     return {
@@ -98,7 +117,8 @@ async def handle_show_settings(request):
 app = web.Application()
 aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('templates'))
 app.add_routes([web.get('/', handle_home),
-                web.get('/config/', handle_show_settings)])
+                web.get('/config/', handle_show_settings),
+                web.get('/ajax/user', handle_load_list)])
 app.router.add_static('/static/',
                       path=str(path.join(path.dirname(__file__), 'static/')),
                       name='static')
