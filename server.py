@@ -5,6 +5,18 @@ import jinja2
 from os import path
 from prawcore.exceptions import NotFound
 import json
+from aiohttp.abc import AbstractAccessLogger
+import logging
+import sys
+
+
+class AccessLogger(AbstractAccessLogger):
+
+    def log(self, request, response, time):
+        self.logger.info(f'{request.remote} '
+                         f'{request.method} {request.rel_url} '
+                         f'done in {time}s: {response.status}')
+
 
 with open('data/bad_subs.json', 'r') as f:
     bad_subs = json.load(f)
@@ -122,6 +134,8 @@ app.add_routes([web.get('/', handle_home),
 app.router.add_static('/static/',
                       path=str(path.join(path.dirname(__file__), 'static/')),
                       name='static')
+app.logger.setLevel(logging.INFO)
 
 if __name__ == '__main__':
-    web.run_app(app, port=settings['port'])
+    logging.basicConfig(level=logging.INFO, handlers=[logging.FileHandler('access.log')])
+    web.run_app(app, port=settings['port'], access_log_class=AccessLogger)
