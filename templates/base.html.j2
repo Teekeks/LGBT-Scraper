@@ -18,11 +18,11 @@
 <header>
   <nav class="teal lighten-1">
     <div class="nav-wrapper">
-        <a href="/" class="brand-logo"> LGBT Reddit Scraper</a>
-        <ul class="right">               
+        <a href="/" class="brand-logo truncate">LGBT Reddit Scraper</a>
+        <ul class="right nav-mobile  hide-on-med-and-down">               
             <li>    
                <div class="center row">
-                  <div class="col s12 " >
+                  <div class="col s12" >
                     <div class="row" id="topbarsearch">
                       <div class="input-field col s6 s12">
                         <form action="/">
@@ -32,9 +32,23 @@
                         </div>
                       </div>
                     </div>
-                  </div>          
-              </li>                     
+                </div>          
+            </li>
         </ul>
+    </div>
+    <div class="nav-content teal lighten-2">
+       <div class="center row  hide-on-large-only">
+          <div class="col s12" >
+            <div class="row" id="topbarsearch">
+              <div class="input-field col s6 s12">
+                <form action="/">
+                    <i class="material-icons prefix smal">search</i>
+                    <input type="text" placeholder="Username" id="autocomplete-input" class="" name="u">
+                </form>
+                </div>
+              </div>
+            </div>
+        </div>
     </div>
   </nav>
   </header>
