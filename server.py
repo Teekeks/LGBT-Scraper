@@ -14,8 +14,9 @@ class AccessLogger(AbstractAccessLogger):
 
     def log(self, request, response, time):
         self.logger.info(f'{request.remote} '
-                         f'{request.method} {request.rel_url} '
-                         f'done in {time}s: {response.status}')
+                         f'"{request.method} {request.rel_url}" '
+                         f'done in {time}s: {response.status} '
+                         f'- "{request.headers.get("User-Agent")}"')
 
 
 with open('data/bad_subs.json', 'r') as f:
