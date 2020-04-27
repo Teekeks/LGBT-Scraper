@@ -8,12 +8,14 @@ import json
 from aiohttp.abc import AbstractAccessLogger
 import logging
 import sys
+from datetime import datetime
 
 
 class AccessLogger(AbstractAccessLogger):
 
     def log(self, request, response, time):
-        self.logger.info(f'{request.remote} '
+        self.logger.info(f'[{datetime.utcnow().strftime("%Y%m%d")}] '
+                         f'{request.remote} '
                          f'"{request.method} {request.rel_url}" '
                          f'done in {time}s: {response.status} '
                          f'- "{request.headers.get("User-Agent")}"')
