@@ -14,7 +14,7 @@ from datetime import datetime
 class AccessLogger(AbstractAccessLogger):
 
     def log(self, request, response, time):
-        self.logger.info(f'[{datetime.utcnow().strftime("%Y%m%d")}] '
+        self.logger.info(f'[{datetime.utcnow().strftime("%Y-%m-%d")}] '
                          f'{request.remote} '
                          f'"{request.method} {request.rel_url}" '
                          f'done in {time}s: {response.status} '
