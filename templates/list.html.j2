@@ -1,3 +1,17 @@
+{% if error is defined %}
+	<div class="row">
+		<div class="col s12">
+			<div class="card red darken-1">
+				<div class="card-content white-text">
+					<span class="card-title">Error</span>
+					<p>User not found</p>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endif %}
+
+{% if user is defined %}
 <div class="row">
 	<div class="col s12">
 		<h5 class="center"><a href="https://reddit.com/u/{{ user.name }}/" target="__blank">/u/{{ user.name }}</a></h5>
@@ -23,7 +37,7 @@
 				<li class="collection-item green lighten-3 avatar">
 					<i class="material-icons circle green lighten-1">{% if comment.type == 'comment' %}comment{% else %}email{% endif %}</i>
 					<span class="title"><b>{{ comment.title }}</b><br/>
-						<b>/r/{{ comment.sub }}</b> | Score: {{ comment.score }}</span>
+						<b>/r/{{ comment.sub }}</b> | Score: {{ comment.score }} | {{ comment.days_since }}</span>
 					<p>{{ comment.body }}</p>
 					<a href="{{ comment.url }}" class="secondary-content" target="__blank"><i class="material-icons">share</i></a>
 				</li>
@@ -36,10 +50,11 @@
 				<li class="collection-item red lighten-3 avatar">
 					<i class="material-icons circle red lighten-1">{% if comment.type == 'comment' %}comment{% else %}email{% endif %}</i>
 					<span class="title"><b>{{ comment.title }}</b><br/>
-						<b>/r/{{ comment.sub }}</b> | Score: {{ comment.score }}</span>
+						<b>/r/{{ comment.sub }}</b> | Score: {{ comment.score }} | {{ comment.days_since }}</span>
 					<p>{{ comment.body }}</p>
 					<a href="{{ comment.url }}" class="secondary-content" target="__blank"><i class="material-icons">share</i></a>
 				</li>
 			{% endfor %}
 	</div>
 </div>
+{% endif %}

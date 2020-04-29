@@ -42,18 +42,24 @@ async def handle_home(request):
     username = request.rel_url.query.get('u')
     if username is not None:
         username = username.strip()
-        u = reddit.redditor(username)
-        try:
-            u.id
-        except NotFound:
-            return {'error': 'no_user'}
         usr = {
-            'name': u.name,
-            'comment_karma': u.comment_karma,
-            'link_karma': u.link_karma
+            'name': username,
         }
         data['user'] = usr
     return data
+
+
+def get_date_since_str(datestr):
+    delta = datetime.utcnow() - datetime.utcfromtimestamp(datestr)
+    delta_str = ""
+    if delta.days == 0:
+        delta_str = 'today'
+    else:
+        delta_str = f'{delta.days} day'
+        if delta.days > 1:
+            delta_str += "s ago"
+        else:
+            delta_str += " ago"
 
 
 @aiohttp_jinja2.template('list.html.j2')
@@ -67,8 +73,6 @@ async def handle_load_list(request):
             u.id
         except NotFound:
             return {'error': 'no_user'}
-        from pprint import pprint
-
         c_lgbt = []
         c_bad = []
         c_t = 0
@@ -84,7 +88,8 @@ async def handle_load_list(request):
                     'url': url,
                     'title': comment.link_title,
                     'type': 'comment',
-                    'date': comment.created_utc
+                    'date': comment.created_utc,
+                    'days_since': get_date_since_str(comment.created_utc)
                 }
             if subname in lgbt_subs:
                 c_lgbt.append(c_data)
@@ -102,7 +107,8 @@ async def handle_load_list(request):
                 'url': url,
                 'title': post.title,
                 'type': 'post',
-                'date': post.created_utc
+                'date': post.created_utc,
+                'days_since': get_date_since_str(post.created_utc)
             }
             if subname in lgbt_subs:
                 c_lgbt.append(p_data)
