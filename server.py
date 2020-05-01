@@ -60,6 +60,7 @@ def get_date_since_str(datestr):
             delta_str += "s ago"
         else:
             delta_str += " ago"
+    return delta_str
 
 
 @aiohttp_jinja2.template('list.html.j2')
