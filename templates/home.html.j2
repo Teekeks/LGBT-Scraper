@@ -41,5 +41,60 @@
 		     }
 		   });
 	</script>
+{% else %}
+<div class="row">
+	<div class="col s12">
+		<div class="card teal lighten-4">
+			<div class="card-content">
+				<span class="card-title">About</span>
+				<p>
+					This Tool can be used to search a reddit account for content that is related to the LGBT+ community in both positive and negative ways.
+				</p>
+			</div>
+		</div>
+	</div>	
+</div>
+
+<div class="row">
+	<div class="col s12">
+		<div class="card green lighten-3">
+			<div class="card-content">
+				<span class="card-title">LGBT+ Content</span>
+				<p>
+					Comments or Posts in Subreddits that are positivly associated with the inclusive LGBT+ community.<br/>
+					See <a href="/config/">here</a> for a list of these Subreddits.
+				</p>
+			</div>
+		</div>
+	</div>	
+</div>
+
+<div class="row">
+	<div class="col s12">
+		<div class="card red lighten-3">
+			<div class="card-content">
+				<span class="card-title">Red Flag Content</span>
+				<p>
+					Comments or Posts in Subreddits that are negativly associated with the inclusive LGBT+ community.<br/>
+					See <a href="/config/">here</a> for a list of these Subreddits.
+				</p>
+			</div>
+		</div>
+	</div>	
+</div>
+
+<div class="row">
+	<div class="col s12">
+		<div class="card blue lighten-3">
+			<div class="card-content">
+				<span class="card-title">Related Content</span>
+				<p>
+					Comments or Posts in other Subreddits that contain either positive or negative keywords that are related to the LGBT+ community.
+				</p>
+			</div>
+		</div>
+	</div>	
+</div>
+
 {% endif %}
 {% endblock %}
