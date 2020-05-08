@@ -37,6 +37,7 @@
 		     data: "u={{ user.name }}",
 		     success: function(data) {
 		          $('#loading_content').html(data);
+		          $('.tabs').tabs();
 		     }
 		   });
 	</script>

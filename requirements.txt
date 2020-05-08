@@ -1,3 +1,5 @@
 aiohttp
 aiohttp-jinja2
 praw
+pymongo
+python-dateutil

@@ -4,11 +4,13 @@ import praw
 import jinja2
 from os import path
 from prawcore.exceptions import NotFound
+from dateutil.relativedelta import relativedelta
 import json
 from aiohttp.abc import AbstractAccessLogger
 import logging
 import sys
 from datetime import datetime
+from pymongo import MongoClient
 
 
 class AccessLogger(AbstractAccessLogger):
@@ -27,6 +29,9 @@ with open('data/bad_subs.json', 'r') as f:
 with open('data/lgbt_subs.json', 'r') as f:
     lgbt_subs = json.load(f)
 
+with open('data/related_words.json', 'r') as f:
+    related_words = json.load(f)
+
 with open('settings.json', 'r') as f:
     settings = json.load(f)
 
@@ -34,6 +39,9 @@ with open('settings.json', 'r') as f:
 reddit = praw.Reddit(client_secret=settings['client_secret'], client_id=settings['client_id'],
                      username=settings['username'], password=settings['password'],
                      user_agent=settings['user_agent'])
+
+db_client = MongoClient(settings['mongodb']['host'], settings['mongodb']['port'])
+db = db_client[settings['mongodb']['db']]
 
 
 @aiohttp_jinja2.template('home.html.j2')
@@ -49,19 +57,50 @@ async def handle_home(request):
     return data
 
 
-def get_date_since_str(datestr):
-    delta = datetime.utcnow() - datetime.utcfromtimestamp(datestr)
+def get_date_since_str(date_str):
+    delta = relativedelta(datetime.utcnow(), datetime.utcfromtimestamp(date_str))
     delta_str = ""
-    if delta.days == 0:
-        delta_str = 'today'
+    if delta.days == 0 and delta.years == 0 and delta.months == 0 and \
+            delta.hours == 0 and delta.minutes == 0 and delta.seconds == 0:
+        delta_str = 'now'
     else:
-        delta_str = f'{delta.days} day'
-        if delta.days > 1:
-            delta_str += "s ago"
-        else:
-            delta_str += " ago"
+        if delta.years > 0:
+            delta_str += f"{delta.years} year"
+            if delta.years > 1:
+                delta_str += "s"
+        if delta.months > 0:
+            if len(delta_str) > 0:
+                delta_str += ", "
+            delta_str += f"{delta.months} month"
+            if delta.months > 1:
+                delta_str += "s"
+        if delta.days > 0:
+            if len(delta_str) > 0:
+                delta_str += ", "
+            delta_str += f"{delta.days} day"
+            if delta.days > 1:
+                delta_str += "s"
+        if len(delta_str) == 0:
+            if delta.hours > 0:
+                if len(delta_str) > 0:
+                    delta_str += ", "
+                delta_str += f"{delta.hours} hour"
+                if delta.hours > 1:
+                    delta_str += "s"
+            else:
+                if delta.minutes > 0:
+                    if len(delta_str) > 0:
+                        delta_str += ", "
+                    delta_str += f"{delta.minutes} minute"
+                    if delta.minutes > 1:
+                        delta_str += "s"
+                if delta.seconds > 0:
+                    if len(delta_str) > 0:
+                        delta_str += ", "
+                    delta_str += f"{delta.seconds} second"
+                    if delta.seconds > 1:
+                        delta_str += "s"
     return delta_str
-
 
 @aiohttp_jinja2.template('list.html.j2')
 async def handle_load_list(request):
@@ -76,8 +115,10 @@ async def handle_load_list(request):
             return {'error': 'no_user'}
         c_lgbt = []
         c_bad = []
+        c_related = []
         c_t = 0
         p_t = 0
+        handled_ids = []
         for comment in u.comments.new(limit=None):
             c_t += 1
             subname = comment.subreddit_name_prefixed[2:].lower()
@@ -94,8 +135,14 @@ async def handle_load_list(request):
                 }
             if subname in lgbt_subs:
                 c_lgbt.append(c_data)
+                handled_ids.append(comment.id)
             if subname in bad_subs:
                 c_bad.append(c_data)
+                handled_ids.append(comment.id)
+            if comment.id not in handled_ids:
+                if any(word in comment.body.split() for word in related_words):
+                    c_related.append(c_data)
+
 
         for post in u.submissions.new(limit=None):
             p_t += 1
@@ -113,16 +160,26 @@ async def handle_load_list(request):
             }
             if subname in lgbt_subs:
                 c_lgbt.append(p_data)
+                handled_ids.append(post.id)
             if subname in bad_subs:
                 c_bad.append(p_data)
+                handled_ids.append(post.id)
+            if post.id not in handled_ids:
+                if any(word in post.selftext.split() for word in related_words):
+                    c_related.append(p_data)
+
         c_lgbt = sorted(c_lgbt, key=lambda d: d['date'], reverse=True)
         c_bad = sorted(c_bad, key=lambda d: d['date'], reverse=True)
+        c_related = sorted(c_related, key=lambda d: d['date'], reverse=True)
         usr = {
             'name': u.name,
+            'account_age': get_date_since_str(u.created_utc),
+            'profile_pic': u.icon_img,
             'comment_karma': u.comment_karma,
             'link_karma': u.link_karma,
             'good': c_lgbt,
-            'flag': c_bad
+            'flag': c_bad,
+            'related': c_related
         }
         data['user'] = usr
         data['comment_count'] = c_t
