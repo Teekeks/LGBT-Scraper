@@ -11,6 +11,8 @@ import logging
 import sys
 from datetime import datetime
 from pymongo import MongoClient
+import asyncio
+import concurrent.futures
 
 
 class AccessLogger(AbstractAccessLogger):
@@ -42,6 +44,8 @@ reddit = praw.Reddit(client_secret=settings['client_secret'], client_id=settings
 
 db_client = MongoClient(settings['mongodb']['host'], settings['mongodb']['port'])
 db = db_client[settings['mongodb']['db']]
+
+executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 
 
 @aiohttp_jinja2.template('home.html.j2')
@@ -102,10 +106,11 @@ def get_date_since_str(date_str):
                         delta_str += "s"
     return delta_str
 
-@aiohttp_jinja2.template('list.html.j2')
-async def handle_load_list(request):
+
+# blocking reddit query
+def query_reddit(user):
     data = {}
-    username = request.rel_url.query.get('u')
+    username = user
     if username is not None:
         username = username.strip()
         u = reddit.redditor(username)
@@ -142,7 +147,6 @@ async def handle_load_list(request):
             if comment.id not in handled_ids:
                 if any(word in comment.body.split() for word in related_words):
                     c_related.append(c_data)
-
 
         for post in u.submissions.new(limit=None):
             p_t += 1
@@ -186,6 +190,15 @@ async def handle_load_list(request):
         data['comment_count'] = c_t
         data['post_count'] = p_t
     return data
+
+
+@aiohttp_jinja2.template('list.html.j2')
+async def handle_load_list(request):
+    user = request.rel_url.query.get('u')
+    completed, pending = await asyncio.wait([asyncio.get_event_loop().run_in_executor(executor, query_reddit, user)])
+    results = [t.result() for t in completed]
+    return results[0]
+
 
 @aiohttp_jinja2.template('config.html.j2')
 async def handle_show_settings(request):
