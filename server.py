@@ -8,9 +8,9 @@ from dateutil.relativedelta import relativedelta
 import json
 from aiohttp.abc import AbstractAccessLogger
 import logging
-import sys
 from datetime import datetime
-from pymongo import MongoClient
+# import sys
+# from pymongo import MongoClient
 import asyncio
 import concurrent.futures
 
@@ -42,8 +42,8 @@ reddit = praw.Reddit(client_secret=settings['client_secret'], client_id=settings
                      username=settings['username'], password=settings['password'],
                      user_agent=settings['user_agent'])
 
-db_client = MongoClient(settings['mongodb']['host'], settings['mongodb']['port'])
-db = db_client[settings['mongodb']['db']]
+# db_client = MongoClient(settings['mongodb']['host'], settings['mongodb']['port'])
+# db = db_client[settings['mongodb']['db']]
 
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 
