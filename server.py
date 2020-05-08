@@ -179,7 +179,8 @@ async def handle_load_list(request):
             'link_karma': u.link_karma,
             'good': c_lgbt,
             'flag': c_bad,
-            'related': c_related
+            'related': c_related,
+            'description': u.subreddit.get('public_description')
         }
         data['user'] = usr
         data['comment_count'] = c_t

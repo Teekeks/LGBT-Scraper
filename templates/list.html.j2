@@ -29,19 +29,20 @@
 </div>
 <div id="general_info_tab" class="col s12">
 	<ul class="collection">
-		<li class="collection-item">Total Karma: {{ user.comment_karma + user.link_karma }}</li>
-		<li class="collection-item">Scraped Content: {{ comment_count + post_count }}</li>
-		<li class="collection-item">LGBT+ Content: {{ user.good|length }}</li>
-		<li class="collection-item">Red flag Content: {{ user.flag|length }}</li>
-		<li class="collection-item">Related Content: {{ user.related|length }}</li>
+		<li class="collection-item"><b>Total Karma:</b> {{ user.comment_karma + user.link_karma }}</li>
+		<li class="collection-item"><b>Profile Description:</b> {{ user.description }}</li>
+		<li class="collection-item"><b>Scraped Content:</b> {{ comment_count + post_count }} entries</li>
 	</ul>
 </div>
 <div id="detail_tab" class="col s12">
 	<ul class="collection">
-		<li class="collection-item">Comment Karma: {{ user.comment_karma }}</li>
-		<li class="collection-item">Link Karma: {{ user.link_karma }}</li>
-		<li class="collection-item">Scraped Comments: {{ comment_count }}</li>
-		<li class="collection-item">Scraped Posts: {{ post_count }}</li>
+		<li class="collection-item"><b>Comment Karma:</b> {{ user.comment_karma }}</li>
+		<li class="collection-item"><b>Link Karma:</b> {{ user.link_karma }}</li>
+		<li class="collection-item"><b>Scraped Comments:</b> {{ comment_count }}</li>
+		<li class="collection-item"><b>Scraped Posts:</b> {{ post_count }}</li>
+		<li class="collection-item"><b>LGBT+ Content:</b> {{ user.good|length }}</li>
+		<li class="collection-item"><b>Red flag Content:</b> {{ user.flag|length }}</li>
+		<li class="collection-item"><b>Related Content:</b> {{ user.related|length }}</li>
 	</ul>
 </div>
 
