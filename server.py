@@ -169,7 +169,8 @@ def query_reddit(user):
                 c_bad.append(p_data)
                 handled_ids.append(post.id)
             if post.id not in handled_ids:
-                if any(word in post.selftext.split() for word in related_words):
+                if any(word.lower() in post.selftext.split() for word in related_words['words']) or \
+                        subname in related_words['subs']:
                     c_related.append(p_data)
 
         c_lgbt = sorted(c_lgbt, key=lambda d: d['date'], reverse=True)
