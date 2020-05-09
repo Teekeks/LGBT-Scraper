@@ -13,6 +13,7 @@ from datetime import datetime
 # from pymongo import MongoClient
 import asyncio
 import concurrent.futures
+import re
 
 
 class AccessLogger(AbstractAccessLogger):
@@ -44,6 +45,8 @@ reddit = praw.Reddit(client_secret=settings['client_secret'], client_id=settings
 
 # db_client = MongoClient(settings['mongodb']['host'], settings['mongodb']['port'])
 # db = db_client[settings['mongodb']['db']]
+
+REMOVED_CHARS = '[.,:;!?+()]'
 
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 
@@ -145,7 +148,9 @@ def query_reddit(user):
                 c_bad.append(c_data)
                 handled_ids.append(comment.id)
             if comment.id not in handled_ids:
-                if any(word in comment.body.split() for word in related_words):
+                prep_body = re.sub(REMOVED_CHARS, ' ', comment.body.lower()).split()
+                if any(word in prep_body for word in related_words['words']) or \
+                        subname in related_words['subs']:
                     c_related.append(c_data)
 
         for post in u.submissions.new(limit=None):
@@ -169,7 +174,8 @@ def query_reddit(user):
                 c_bad.append(p_data)
                 handled_ids.append(post.id)
             if post.id not in handled_ids:
-                if any(word.lower() in post.selftext.split() for word in related_words['words']) or \
+                prep_body = re.sub(REMOVED_CHARS, ' ', post.selftext.lower()).split()
+                if any(word in prep_body for word in related_words['words']) or \
                         subname in related_words['subs']:
                     c_related.append(p_data)
 
