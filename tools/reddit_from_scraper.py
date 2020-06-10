@@ -12,7 +12,7 @@ db_c = db['reddit']
 db_ss = db_client['subreddit_prober']
 db_s = db_ss['subreddit']
 
-potential_data = db_s.find({'sub': {'$regex': '.*aromantic.*'}}).sort([("nr_of_users", DESCENDING)])
+potential_data = db_s.find({'description': {'$regex': '.*gsm.*'}}).sort([("nr_of_users", DESCENDING)])
 
 for pot_dat in potential_data:
     t = 'subreddit' # input("Subreddit or Word [s/w]:")
