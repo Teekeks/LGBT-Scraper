@@ -218,7 +218,7 @@ async def handle_show_settings(request):
 app = web.Application()
 aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('templates'))
 app.add_routes([web.get('/', handle_home),
-                web.get('/config/', handle_show_settings),
+                # web.get('/config/', handle_show_settings),
                 web.get('/ajax/user', handle_load_list)])
 app.router.add_static('/static/',
                       path=str(path.join(path.dirname(__file__), 'static/')),
