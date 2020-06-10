@@ -10,7 +10,7 @@ from aiohttp.abc import AbstractAccessLogger
 import logging
 from datetime import datetime
 # import sys
-# from pymongo import MongoClient
+from pymongo import MongoClient
 import asyncio
 import concurrent.futures
 import re
@@ -26,15 +26,6 @@ class AccessLogger(AbstractAccessLogger):
                          f'- "{request.headers.get("User-Agent")}"')
 
 
-with open('data/bad_subs.json', 'r') as f:
-    bad_subs = json.load(f)
-
-with open('data/lgbt_subs.json', 'r') as f:
-    lgbt_subs = json.load(f)
-
-with open('data/related_words.json', 'r') as f:
-    related_words = json.load(f)
-
 with open('settings.json', 'r') as f:
     settings = json.load(f)
 
@@ -43,17 +34,21 @@ reddit = praw.Reddit(client_secret=settings['client_secret'], client_id=settings
                      username=settings['username'], password=settings['password'],
                      user_agent=settings['user_agent'])
 
-# db_client = MongoClient(settings['mongodb']['host'], settings['mongodb']['port'])
-# db = db_client[settings['mongodb']['db']]
+db_client = MongoClient(settings['mongodb']['host'], settings['mongodb']['port'])
+db = db_client[settings['mongodb']['db']]
+db_reddit = db['reddit']
 
-REMOVED_CHARS = '[.,:;!?+()]'
+REMOVED_CHARS = re.compile(r'[.,:;!?+(){}<>\*\[\]]')
 
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 
 
 @aiohttp_jinja2.template('home.html.j2')
 async def handle_home(request):
-    data = {}
+    factor_count = db_reddit.count_documents({})
+    data = {
+        'factor_count': factor_count
+    }
     username = request.rel_url.query.get('u')
     if username is not None:
         username = username.strip()
@@ -64,8 +59,22 @@ async def handle_home(request):
     return data
 
 
+def get_data():
+    data = {}
+    for cat in ['red', 'green', 'related']:
+        data[cat] = {
+            'subs': [k.get('data') for k in db_reddit.find({'category': cat, 'type': 'subreddit'})],
+            'words': [k.get('data') for k in db_reddit.find({'category': cat, 'type': 'word'})]
+        }
+    return data
+
+
 def get_date_since_str(date_str):
-    delta = relativedelta(datetime.utcnow(), datetime.utcfromtimestamp(date_str))
+    if isinstance(date_str, float):
+        since = datetime.utcfromtimestamp(date_str)
+    else:
+        since = date_str
+    delta = relativedelta(datetime.utcnow(), since)
     delta_str = ""
     if delta.days == 0 and delta.years == 0 and delta.months == 0 and \
             delta.hours == 0 and delta.minutes == 0 and delta.seconds == 0:
@@ -112,6 +121,7 @@ def get_date_since_str(date_str):
 
 # blocking reddit query
 def query_reddit(user):
+    start_time = datetime.utcnow()
     data = {}
     username = user
     if username is not None:
@@ -121,9 +131,12 @@ def query_reddit(user):
             u.id
         except NotFound:
             return {'error': 'no_user'}
-        c_lgbt = []
-        c_bad = []
-        c_related = []
+        cat_data = get_data()
+        c_ = {
+            'red': [],
+            'green': [],
+            'related': []
+        }
         c_t = 0
         p_t = 0
         handled_ids = []
@@ -141,17 +154,11 @@ def query_reddit(user):
                     'date': comment.created_utc,
                     'days_since': get_date_since_str(comment.created_utc)
                 }
-            if subname in lgbt_subs:
-                c_lgbt.append(c_data)
-                handled_ids.append(comment.id)
-            if subname in bad_subs:
-                c_bad.append(c_data)
-                handled_ids.append(comment.id)
-            if comment.id not in handled_ids:
-                prep_body = re.sub(REMOVED_CHARS, ' ', comment.body.lower()).split()
-                if any(word in prep_body for word in related_words['words']) or \
-                        subname in related_words['subs']:
-                    c_related.append(c_data)
+            prep_body = REMOVED_CHARS.sub(' ', comment.body.lower()).split()
+            for key, item in cat_data.items():
+                if subname in item['subs'] or any(word in prep_body for word in item['words']):
+                    c_[key].append(c_data)
+                    break
 
         for post in u.submissions.new(limit=None):
             p_t += 1
@@ -167,33 +174,27 @@ def query_reddit(user):
                 'date': post.created_utc,
                 'days_since': get_date_since_str(post.created_utc)
             }
-            if subname in lgbt_subs:
-                c_lgbt.append(p_data)
-                handled_ids.append(post.id)
-            if subname in bad_subs:
-                c_bad.append(p_data)
-                handled_ids.append(post.id)
-            if post.id not in handled_ids:
-                prep_body = re.sub(REMOVED_CHARS, ' ', post.selftext.lower()).split()
-                if any(word in prep_body for word in related_words['words']) or \
-                        subname in related_words['subs']:
-                    c_related.append(p_data)
+            prep_search = REMOVED_CHARS.sub(' ', f'{post.selftext} {post.title}'.lower()).split()
+            for key, item in cat_data.items():
+                if subname in item['subs'] or any(word in prep_search for word in item['words']):
+                    c_[key].append(p_data)
+                    break
 
-        c_lgbt = sorted(c_lgbt, key=lambda d: d['date'], reverse=True)
-        c_bad = sorted(c_bad, key=lambda d: d['date'], reverse=True)
-        c_related = sorted(c_related, key=lambda d: d['date'], reverse=True)
+        for key, item in c_.items():
+            c_[key] = sorted(item, key=lambda d: d['date'], reverse=True)
         usr = {
             'name': u.name,
             'account_age': get_date_since_str(u.created_utc),
             'profile_pic': u.icon_img,
             'comment_karma': u.comment_karma,
             'link_karma': u.link_karma,
-            'good': c_lgbt,
-            'flag': c_bad,
-            'related': c_related,
+            'good': c_['green'],
+            'flag': c_['red'],
+            'related': c_['related'],
             'description': u.subreddit.get('public_description')
         }
         data['user'] = usr
+        data['processing_time'] = get_date_since_str(start_time)
         data['comment_count'] = c_t
         data['post_count'] = p_t
     return data
@@ -210,8 +211,8 @@ async def handle_load_list(request):
 @aiohttp_jinja2.template('config.html.j2')
 async def handle_show_settings(request):
     return {
-        "lgbt_subs": lgbt_subs,
-        "flag_subs": bad_subs
+        "lgbt_subs": [],
+        "flag_subs": []
     }
 
 app = web.Application()
