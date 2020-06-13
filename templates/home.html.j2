@@ -33,7 +33,7 @@
 		// dynamic loading
 		$.ajax({
 		     type: "GET",
-		     url: '/ajax/user',
+		     url: '/ajax/twitter/user',
 		     data: "u={{ user.name }}",
 		     success: function(data) {
 		          $('#loading_content').html(data);

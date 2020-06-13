@@ -1,0 +1,14 @@
+<li class="collection-item {{ color_type }} lighten-3 avatar">
+	<i class="material-icons circle {{ color_type }} lighten-1">{% if comment.type == 'tweet' %}comment{% else %}favorite{% endif %}</i>
+	<span class="title"><b>{% if comment.retweeted is defined %}RT @{{ comment.retweeted.user_name }} {% else %} @{{ user.name }} {% endif %}</b> | {{ comment.age }}{% if comment.age != 'now' %} ago{% endif %}</span>
+	<p>{{ comment.text }}</p>
+	{% if comment.quoted is defined %}
+		<div class="card {{ color_type }} lighten-3">
+			<div class="card-content">
+				<b>@{{ comment.quoted.user_name }}</b> | {{ comment.quoted.age }}{% if comment.quoted.age != 'now' %} ago{% endif %}<br/>
+				<p>{{ comment.quoted.text }}</p>
+			</div>
+		</div>
+	{% endif %}
+	<a href="{{ comment.url }}" class="secondary-content" target="_blank" rel="noopener noreferrer"><i class="material-icons">share</i></a>
+</li>

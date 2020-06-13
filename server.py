@@ -14,6 +14,7 @@ from pymongo import MongoClient
 import asyncio
 import concurrent.futures
 import re
+import twitter_helper as th
 
 
 class AccessLogger(AbstractAccessLogger):
@@ -34,11 +35,15 @@ reddit = praw.Reddit(client_secret=settings['client_secret'], client_id=settings
                      username=settings['username'], password=settings['password'],
                      user_agent=settings['user_agent'])
 
+twitter = th.TwitterHelper(settings['twitter'])
+
 db_client = MongoClient(settings['mongodb']['host'], settings['mongodb']['port'])
 db = db_client[settings['mongodb']['db']]
 db_reddit = db['reddit']
+db_twitter = db['twitter']
 
 REMOVED_CHARS = re.compile(r'[.,:;!?+(){}<>\*\[\]]')
+TWITTER_PROFILE_URL_FIX = re.compile(r'_normal')
 
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 
@@ -59,12 +64,12 @@ async def handle_home(request):
     return data
 
 
-def get_data():
+def get_data(use_db):
     data = {}
     for cat in ['red', 'green', 'related']:
         data[cat] = {
-            'subs': [k.get('data') for k in db_reddit.find({'category': cat, 'type': 'subreddit'})],
-            'words': [k.get('data') for k in db_reddit.find({'category': cat, 'type': 'word'})]
+            'subs': [k.get('data') for k in use_db.find({'category': cat, 'type': 'subreddit'})],
+            'words': [k.get('data') for k in use_db.find({'category': cat, 'type': 'word'})]
         }
     return data
 
@@ -131,7 +136,7 @@ def query_reddit(user):
             u.id
         except NotFound:
             return {'error': 'no_user'}
-        cat_data = get_data()
+        cat_data = get_data(db_reddit)
         c_ = {
             'red': [],
             'green': [],
@@ -200,10 +205,96 @@ def query_reddit(user):
     return data
 
 
-@aiohttp_jinja2.template('list.html.j2')
-async def handle_load_list(request):
+def twitter_data(user):
+
+    def build_tweet_data(tweet, tweet_type):
+        data = {
+            'text': th.get_tweet_text(tweet),
+            'full_text': th.get_full_search_tweet_text(tweet),
+            'id': tweet.id_str,
+            'old_id': tweet.id,
+            'type': tweet_type,
+            'url': f'https://twitter.com/{user}/status/{tweet.id_str}',
+            'age': get_date_since_str(th.to_datetime(tweet.created_at))
+            }
+        if tweet.quoted_status is not None:
+            t = tweet.quoted_status
+            qt = {
+                'text': t.full_text,
+                'id': t.id_str,
+                'old_id': t.id,
+                'type': 'tweet',
+                'user_name': t.user.screen_name,
+                'age': get_date_since_str(th.to_datetime(t.created_at)),
+                'url': f'https://twitter.com/{t.user.screen_name}/status/{t.id_str}'
+            }
+            data['quoted'] = qt
+        if tweet.retweeted_status is not None:
+            t = tweet.retweeted_status
+            rt = {
+                'user_name': t.user.screen_name
+            }
+            data['retweeted'] = rt
+        return data
+
+    tweets = twitter.get_tweets(user)
+    likes = twitter.get_favorites(user)
+    data = [build_tweet_data(t, 'tweet') for t in tweets]
+    data.extend([build_tweet_data(t, 'like') for t in likes])
+    return sorted(data, key=lambda d: d['id'], reverse=True), len(tweets), len(likes)
+
+
+def query_twitter(user):
+    start_time = datetime.utcnow()
+    data = {}
+    if user is not None:
+        tweets, c_t, c_l = twitter_data(user)
+        usr_d = twitter.get_user_info(user)
+        cat_data = get_data(db_twitter)
+        c_ = {
+            'red': [],
+            'green': [],
+            'related': []
+        }
+        for tweet in tweets:
+            body = REMOVED_CHARS.sub(' ', tweet["full_text"].lower()).split()
+            for key, item in cat_data.items():
+                if any(word in body for word in item['words']):
+                    c_[key].append(tweet)
+        usr = {
+            'name': usr_d.screen_name,
+            'good': c_['green'],
+            'flag': c_['red'],
+            'related': c_['related'],
+            'account_age': get_date_since_str(th.to_datetime(usr_d.created_at)),
+            'description': usr_d.description,
+            'display_name': usr_d.name,
+            'followers_count': usr_d.followers_count,
+            'friends_count': usr_d.friends_count,
+            'tweets_count': usr_d.statuses_count,
+            'favourites_count': usr_d.favourites_count,
+            'verified': usr_d.verified,
+            'profile_pic': TWITTER_PROFILE_URL_FIX.sub('', usr_d.profile_image_url_https)
+        }
+        data['user'] = usr
+        data['count_tweets'] = c_t
+        data['count_likes'] = c_l
+        data['processing_time'] = get_date_since_str(start_time)
+    return data
+
+
+@aiohttp_jinja2.template('list_reddit.html.j2')
+async def handle_load_list_reddit(request):
     user = request.rel_url.query.get('u')
     completed, pending = await asyncio.wait([asyncio.get_event_loop().run_in_executor(executor, query_reddit, user)])
+    results = [t.result() for t in completed]
+    return results[0]
+
+
+@aiohttp_jinja2.template('list_twitter.html.j2')
+async def handle_load_list_twitter(request):
+    user = request.rel_url.query.get('u')
+    completed, pending = await asyncio.wait([asyncio.get_event_loop().run_in_executor(executor, query_twitter, user)])
     results = [t.result() for t in completed]
     return results[0]
 
@@ -219,7 +310,8 @@ app = web.Application()
 aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('templates'))
 app.add_routes([web.get('/', handle_home),
                 # web.get('/config/', handle_show_settings),
-                web.get('/ajax/user', handle_load_list)])
+                web.get('/ajax/reddit/user', handle_load_list_reddit),
+                web.get('/ajax/twitter/user', handle_load_list_twitter)])
 app.router.add_static('/static/',
                       path=str(path.join(path.dirname(__file__), 'static/')),
                       name='static')
