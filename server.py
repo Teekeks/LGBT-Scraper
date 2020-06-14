@@ -9,7 +9,6 @@ import json
 from aiohttp.abc import AbstractAccessLogger
 import logging
 from datetime import datetime
-# import sys
 from pymongo import MongoClient
 import asyncio
 import concurrent.futures
@@ -28,13 +27,18 @@ class AccessLogger(AbstractAccessLogger):
                          f'- "{request.headers.get("User-Agent")}"')
 
 
+# ======================================================================================================================
+# Init
+# ======================================================================================================================
+
+
 with open('settings.json', 'r') as f:
     settings = json.load(f)
 
-
-reddit = praw.Reddit(client_secret=settings['client_secret'], client_id=settings['client_id'],
-                     username=settings['username'], password=settings['password'],
-                     user_agent=settings['user_agent'])
+rs = settings['reddit']
+reddit = praw.Reddit(client_secret=rs['client_secret'], client_id=rs['client_id'],
+                     username=rs['username'], password=rs['password'],
+                     user_agent=rs['user_agent'])
 
 twitter = th.TwitterHelper(settings['twitter'])
 
@@ -48,16 +52,9 @@ TWITTER_PROFILE_URL_FIX = re.compile(r'_normal')
 
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 
-
-@aiohttp_jinja2.template('home.html.j2')
-async def handle_home(request):
-    data = {
-        'factor_count': {
-            'reddit': db_reddit.count_documents({}),
-            'twitter': db_twitter.count_documents({})
-        }
-    }
-    return data
+# ======================================================================================================================
+# Helpers
+# ======================================================================================================================
 
 
 def get_data(use_db):
@@ -119,15 +116,17 @@ def get_date_since_str(date_str):
                         delta_str += "s"
     return delta_str
 
+# ======================================================================================================================
+# API Queries
+# ======================================================================================================================
 
-# blocking reddit query
+
 def query_reddit(user):
     start_time = datetime.utcnow()
     data = {}
-    username = user
-    if username is not None:
-        username = username.strip()
-        u = reddit.redditor(username)
+    if user is not None:
+        user = user.strip()
+        u = reddit.redditor(user)
         try:
             u.id
         except NotFound:
@@ -142,7 +141,6 @@ def query_reddit(user):
         }
         c_t = 0
         p_t = 0
-        handled_ids = []
         for comment in u.comments.new(limit=None):
             c_t += 1
             subname = comment.subreddit_name_prefixed[2:].lower()
@@ -204,7 +202,6 @@ def query_reddit(user):
 
 
 def twitter_data(user):
-
     def build_tweet_data(tweet, tweet_type):
         data = {
             'text': th.get_tweet_text(tweet),
@@ -288,6 +285,11 @@ def query_twitter(user):
     return data
 
 
+# ======================================================================================================================
+# Request Handlers
+# ======================================================================================================================
+
+
 @aiohttp_jinja2.template('list_reddit.html.j2')
 async def handle_load_list_reddit(request):
     user = request.match_info['user_name']
@@ -338,6 +340,21 @@ async def handle_twitter(request):
     return data
 
 
+@aiohttp_jinja2.template('home.html.j2')
+async def handle_home(request):
+    data = {
+        'factor_count': {
+            'reddit': db_reddit.count_documents({}),
+            'twitter': db_twitter.count_documents({})
+        }
+    }
+    return data
+
+# ======================================================================================================================
+# Service Startup
+# ======================================================================================================================
+
+
 app = web.Application()
 aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('templates'))
 app.add_routes([web.get('/', handle_home),
@@ -345,7 +362,6 @@ app.add_routes([web.get('/', handle_home),
                 web.get('/twitter/{user_name}', handle_twitter),
                 web.get('/r/{user_name}', handle_reddit),
                 web.get('/reddit/{user_name}', handle_reddit),
-                # web.get('/config/', handle_show_settings),
                 web.get('/ajax/reddit/{user_name}', handle_load_list_reddit),
                 web.get('/ajax/twitter/{user_name}', handle_load_list_twitter)])
 app.router.add_static('/static/',

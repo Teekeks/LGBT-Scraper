@@ -1,8 +1,21 @@
 {
   "port": 45798,
-  "username": "",
-  "password": "",
-  "client_secret": "",
-  "client_id": "",
-  "user_agent": "LGBT scraper (by /u/Teekeks)"
+  "mongodb": {
+    "host": "localhost",
+    "port": 27017,
+    "db": "lgbt_scraper"
+  },
+  "reddit": {
+    "username": "",
+    "password": "",
+    "client_secret": "",
+    "client_id": "",
+    "user_agent": "LGBT scraper (by /u/Teekeks)"
+  },
+  "twitter": {
+    "access_key": "",
+    "access_secret": "",
+    "consumer_key": "",
+    "consumer_secret": ""
+  }
 }
