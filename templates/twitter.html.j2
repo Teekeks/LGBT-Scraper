@@ -37,6 +37,11 @@
 		     success: function(data) {
 		          $('#loading_content').html(data);
 		          $('.tabs').tabs();
+		     },
+		     error: function(data) {
+		     	console.log('An error occured')
+		     	$('#loading_content').html("An error occured");
+		          
 		     }
 		   });
 	</script>
