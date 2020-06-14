@@ -315,7 +315,7 @@ async def handle_load_list_twitter(request):
     except:
         return {
             'error': {
-                'reason': 'An error occurred while trying to scrape the account. Please try again in a bit.'
+                'reason': 'An error occurred while trying to scrape the account. It might be set to private.'
             }
         }
 
