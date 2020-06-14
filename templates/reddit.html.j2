@@ -1,0 +1,42 @@
+{% extends "base.html.j2" %}
+
+{% block content %}
+{% if user is defined %}
+	<div id="loading_content">
+		<div class="row">
+			<div class="col s6 offset-s3">
+				<div class="progress">
+      				<div class="indeterminate"></div>
+  				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col s12">
+		  		<div class="center-align grey-text text-darken-1">Scraping reddit account for user {{ user.name }}...</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		// dynamic loading
+		$.ajax({
+		     type: "GET",
+		     url: '/ajax/reddit/{{ user.name }}',
+		     success: function(data) {
+		          $('#loading_content').html(data);
+		          $('.tabs').tabs();
+		     }
+		   });
+	</script>
+{% else %}
+	<div class="row">
+		<div class="col s12">
+			<div class="card red darken-1">
+				<div class="card-content white-text">
+					<span class="card-title">Error</span>
+					<p>User not found</p>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endif %}
+{% endblock %}

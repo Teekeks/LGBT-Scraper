@@ -56,13 +56,6 @@ async def handle_home(request):
             'twitter': db_twitter.count_documents({})
         }
     }
-    username = request.rel_url.query.get('u')
-    if username is not None:
-        username = username.strip()
-        usr = {
-            'name': username,
-        }
-        data['user'] = usr
     return data
 
 
@@ -287,7 +280,7 @@ def query_twitter(user):
 
 @aiohttp_jinja2.template('list_reddit.html.j2')
 async def handle_load_list_reddit(request):
-    user = request.rel_url.query.get('u')
+    user = request.match_info['user_name']
     completed, pending = await asyncio.wait([asyncio.get_event_loop().run_in_executor(executor, query_reddit, user)])
     results = [t.result() for t in completed]
     return results[0]
@@ -295,7 +288,7 @@ async def handle_load_list_reddit(request):
 
 @aiohttp_jinja2.template('list_twitter.html.j2')
 async def handle_load_list_twitter(request):
-    user = request.rel_url.query.get('u')
+    user = request.match_info['user_name']
     completed, pending = await asyncio.wait([asyncio.get_event_loop().run_in_executor(executor, query_twitter, user)])
     results = [t.result() for t in completed]
     return results[0]
@@ -308,12 +301,43 @@ async def handle_show_settings(request):
         "flag_subs": []
     }
 
+
+@aiohttp_jinja2.template('reddit.html.j2')
+async def handle_reddit(request):
+    user_name = request.match_info['user_name']
+    data = {}
+    if user_name is not None and len(user_name) > 0:
+        username = user_name.strip()
+        usr = {
+            'name': username,
+        }
+        data['user'] = usr
+    return data
+
+
+@aiohttp_jinja2.template('twitter.html.j2')
+async def handle_twitter(request):
+    user_name = request.match_info['user_name']
+    data = {}
+    if user_name is not None and len(user_name) > 0:
+        username = user_name.strip()
+        usr = {
+            'name': username,
+        }
+        data['user'] = usr
+    return data
+
+
 app = web.Application()
 aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('templates'))
 app.add_routes([web.get('/', handle_home),
+                web.get('/t/{user_name}', handle_twitter),
+                web.get('/twitter/{user_name}', handle_twitter),
+                web.get('/r/{user_name}', handle_reddit),
+                web.get('/reddit/{user_name}', handle_reddit),
                 # web.get('/config/', handle_show_settings),
-                web.get('/ajax/reddit/user', handle_load_list_reddit),
-                web.get('/ajax/twitter/user', handle_load_list_twitter)])
+                web.get('/ajax/reddit/{user_name}', handle_load_list_reddit),
+                web.get('/ajax/twitter/{user_name}', handle_load_list_twitter)])
 app.router.add_static('/static/',
                       path=str(path.join(path.dirname(__file__), 'static/')),
                       name='static')
