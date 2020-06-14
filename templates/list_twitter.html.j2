@@ -4,7 +4,7 @@
 			<div class="card red darken-1">
 				<div class="card-content white-text">
 					<span class="card-title">Error</span>
-					<p>User not found</p>
+					<p>{{ error.reason }}</p>
 				</div>
 			</div>
 		</div>
@@ -12,6 +12,7 @@
 {% endif %}
 
 {% if user is defined %}
+<div class="row"></div>
 <div class="row">
 	<div class="col s12">
 		<div class="center"><img src="{{ user.profile_pic }}" style="border-radius: 50%; width: 132px; height: 132px;"></div>

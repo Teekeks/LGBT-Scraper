@@ -4,7 +4,7 @@
 			<div class="card red darken-1">
 				<div class="card-content white-text">
 					<span class="card-title">Error</span>
-					<p>User not found</p>
+					<p>{{ error.reason }}</p>
 				</div>
 			</div>
 		</div>
@@ -12,6 +12,7 @@
 {% endif %}
 
 {% if user is defined %}
+<div class="row"></div>
 <div class="row">
 	<div class="col s12">
 		<div class="center"><img src="{{ user.profile_pic }}"></div>
@@ -60,13 +61,9 @@
 <div id="lgbt_content" class="col s12">
 	<ul class="collection">
 		{% for comment in user.good %}
-			<li class="collection-item green lighten-3 avatar">
-				<i class="material-icons circle green lighten-1">{% if comment.type == 'comment' %}comment{% else %}email{% endif %}</i>
-				<span class="title"><b>{{ comment.title }}</b><br/>
-					<b>/r/{{ comment.sub }}</b> | Score: {{ comment.score }} | {{ comment.days_since }}{% if comment.days_since != 'today' %} ago{% endif %}</span>
-				<p>{{ comment.body }}</p>
-				<a href="{{ comment.url }}" class="secondary-content" target="_blank" rel="noopener noreferrer"><i class="material-icons">share</i></a>
-			</li>
+			{% with color_type = 'green' %}
+				{% include "reddit_list_entry.html.j2" %}
+			{% endwith %}
 		{% endfor %}
 	</ul>
 </div>
@@ -74,13 +71,9 @@
 <div id="flag_content" class="col s12">
 	<ul class="collection">
 		{% for comment in user.flag %}
-			<li class="collection-item red lighten-3 avatar">
-				<i class="material-icons circle red lighten-1">{% if comment.type == 'comment' %}comment{% else %}email{% endif %}</i>
-				<span class="title"><b>{{ comment.title }}</b><br/>
-					<b>/r/{{ comment.sub }}</b> | Score: {{ comment.score }} | {{ comment.days_since }}{% if comment.days_since != 'today' %} ago{% endif %}</span>
-				<p>{{ comment.body }}</p>
-				<a href="{{ comment.url }}" class="secondary-content" target="_blank" rel="noopener noreferrer"><i class="material-icons">share</i></a>
-			</li>
+			{% with color_type = 'red' %}
+				{% include "reddit_list_entry.html.j2" %}
+			{% endwith %}
 		{% endfor %}
 	</ul>
 </div>
@@ -88,13 +81,9 @@
 <div id="related_content" class="col s12">
 	<ul class="collection">
 		{% for comment in user.related %}
-			<li class="collection-item blue lighten-3 avatar">
-				<i class="material-icons circle blue lighten-1">{% if comment.type == 'comment' %}comment{% else %}email{% endif %}</i>
-				<span class="title"><b>{{ comment.title }}</b><br/>
-					<b>/r/{{ comment.sub }}</b> | Score: {{ comment.score }} | {{ comment.days_since }}{% if comment.days_since != 'today' %} ago{% endif %}</span>
-				<p>{{ comment.body }}</p>
-				<a href="{{ comment.url }}" class="secondary-content" target="_blank" rel="noopener noreferrer"><i class="material-icons">share</i></a>
-			</li>
+			{% with color_type = 'blue' %}
+				{% include "reddit_list_entry.html.j2" %}
+			{% endwith %}
 		{% endfor %}
 	</ul>
 </div>

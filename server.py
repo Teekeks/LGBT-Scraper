@@ -130,7 +130,9 @@ def query_reddit(user):
         try:
             u.id
         except NotFound:
-            return {'error': 'no_user'}
+            return {'error': {
+                'reason': 'User not found!'
+            }}
         cat_data = get_data(db_reddit)
         c_ = {
             'red': [],
