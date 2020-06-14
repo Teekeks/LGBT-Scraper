@@ -273,8 +273,8 @@ def query_twitter(user):
             'display_name': usr_d.name,
             'followers_count': usr_d.followers_count,
             'friends_count': usr_d.friends_count,
-            'tweets_count': usr_d.statuses_count,
-            'favourites_count': usr_d.favourites_count,
+            'tweets_count': usr_d.statuses_count if c_t < usr_d.statuses_count else c_t,
+            'favourites_count': usr_d.favourites_count if c_l < usr_d.favourites_count else c_l,
             'verified': usr_d.verified,
             'profile_pic': TWITTER_PROFILE_URL_FIX.sub('', usr_d.profile_image_url_https)
         }
