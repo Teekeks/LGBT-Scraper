@@ -31,7 +31,8 @@ class TwitterHelper:
             cfg['consumer_secret'],
             cfg['access_key'],
             cfg['access_secret'],
-            tweet_mode='extended'
+            tweet_mode='extended',
+            sleep_on_rate_limit=True
         )
         self.retries = 5
 
