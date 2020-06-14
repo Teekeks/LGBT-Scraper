@@ -293,17 +293,31 @@ def query_twitter(user):
 @aiohttp_jinja2.template('list_reddit.html.j2')
 async def handle_load_list_reddit(request):
     user = request.match_info['user_name']
-    completed, pending = await asyncio.wait([asyncio.get_event_loop().run_in_executor(executor, query_reddit, user)])
-    results = [t.result() for t in completed]
-    return results[0]
+    try:
+        completed, pending = await asyncio.wait([asyncio.get_event_loop().run_in_executor(executor, query_reddit, user)])
+        results = [t.result() for t in completed]
+        return results[0]
+    except:
+        return {
+            'error': {
+                'reason': 'An error occurred while trying to scrape the account. Please try again in a bit.'
+            }
+        }
 
 
 @aiohttp_jinja2.template('list_twitter.html.j2')
 async def handle_load_list_twitter(request):
-    user = request.match_info['user_name']
-    completed, pending = await asyncio.wait([asyncio.get_event_loop().run_in_executor(executor, query_twitter, user)])
-    results = [t.result() for t in completed]
-    return results[0]
+    try:
+        user = request.match_info['user_name']
+        completed, pending = await asyncio.wait([asyncio.get_event_loop().run_in_executor(executor, query_twitter, user)])
+        results = [t.result() for t in completed]
+        return results[0]
+    except:
+        return {
+            'error': {
+                'reason': 'An error occurred while trying to scrape the account. Please try again in a bit.'
+            }
+        }
 
 
 @aiohttp_jinja2.template('config.html.j2')
