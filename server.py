@@ -50,9 +50,11 @@ executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 
 @aiohttp_jinja2.template('home.html.j2')
 async def handle_home(request):
-    factor_count = db_reddit.count_documents({})
     data = {
-        'factor_count': factor_count
+        'factor_count': {
+            'reddit': db_reddit.count_documents({}),
+            'twitter': db_twitter.count_documents({})
+        }
     }
     username = request.rel_url.query.get('u')
     if username is not None:
