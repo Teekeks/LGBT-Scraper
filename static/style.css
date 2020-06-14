@@ -1,11 +1,19 @@
 
 #topbarsearch .input-field .prefix { 
-	width:0rem !important;    
+	width:0rem !important;
 }        
 #topbarsearch nav ul li:hover, nav ul li.active {
     background-color: none !important;
 }
 
+#topbarsearch .input-field {
+  margin: 0px;
+}
+
+
+#topbarsearch {
+  margin: 0px;
+}
 
 ::placeholder {
   color: #eee;
@@ -23,7 +31,8 @@
 
 i.prefix {
 	color: #FFF;
-	margin-right: 5px !important;
+  margin-top: 5px;
+	margin-right: 1px !important;
 }
 
 
