@@ -15,6 +15,7 @@ import asyncio
 import concurrent.futures
 import re
 import twitter_helper as th
+from twitter.error import TwitterError
 
 
 class AccessLogger(AbstractAccessLogger):
@@ -245,8 +246,15 @@ def query_twitter(user):
     start_time = datetime.utcnow()
     data = {}
     if user is not None:
+        try:
+            usr_d = twitter.get_user_info(user)
+        except TwitterError:
+            return {
+                'error': {
+                    'reason': 'User not found'
+                }
+            }
         tweets, c_t, c_l = twitter_data(user)
-        usr_d = twitter.get_user_info(user)
         cat_data = get_data(db_twitter)
         c_ = {
             'red': [],
