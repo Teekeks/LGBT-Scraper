@@ -15,6 +15,8 @@ import concurrent.futures
 import re
 import twitter_helper as th
 from twitter.error import TwitterError
+from tag_reasons import *
+
 
 
 class AccessLogger(AbstractAccessLogger):
@@ -116,6 +118,13 @@ def get_date_since_str(date_str):
                         delta_str += "s"
     return delta_str
 
+
+def add_reason(data, reason):
+    if not hasattr(data, 'reason'):
+        data['reason'] = []
+    data['reason'].append(reason)
+    return data
+
 # ======================================================================================================================
 # API Queries
 # ======================================================================================================================
@@ -157,9 +166,15 @@ def query_reddit(user):
                 }
             prep_body = REMOVED_CHARS.sub(' ', comment.body.lower()).split()
             for key, item in cat_data.items():
-                if subname in item['subs'] or any(word in prep_body for word in item['words']):
+                add = False
+                if subname in item['subs']:
+                    add = True
+                    c_data = add_reason(c_data, REASON_SUBREDDIT)
+                if any(word in prep_body for word in item['words']):
+                    add = True
+                    c_data = add_reason(c_data, REASON_WORD)
+                if add:
                     c_[key].append(c_data)
-                    break
 
         for post in u.submissions.new(limit=None):
             p_t += 1
@@ -177,9 +192,15 @@ def query_reddit(user):
             }
             prep_search = REMOVED_CHARS.sub(' ', f'{post.selftext} {post.title}'.lower()).split()
             for key, item in cat_data.items():
-                if subname in item['subs'] or any(word in prep_search for word in item['words']):
+                add = False
+                if subname in item['subs']:
+                    add = True
+                    p_data = add_reason(p_data, REASON_SUBREDDIT)
+                if any(word in prep_search for word in item['words']):
+                    add = True
+                    p_data = add_reason(p_data, REASON_WORD)
+                if add:
                     c_[key].append(p_data)
-                    break
 
         for key, item in c_.items():
             c_[key] = sorted(item, key=lambda d: d['date'], reverse=True)
@@ -262,6 +283,7 @@ def query_twitter(user):
             body = REMOVED_CHARS.sub(' ', tweet["full_text"].lower()).split()
             for key, item in cat_data.items():
                 if any(word in body for word in item['words']):
+                    tweet = add_reason(tweet, REASON_WORD)
                     c_[key].append(tweet)
         usr = {
             'name': usr_d.screen_name,
