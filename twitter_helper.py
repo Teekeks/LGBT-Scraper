@@ -34,12 +34,13 @@ class TwitterHelper:
             tweet_mode='extended',
             sleep_on_rate_limit=True
         )
-        self.retries = 5
+        self.get_tweets_retries = 5
+        self.get_user_retries = 3
 
     def get_tweets(self, screen_name):
         timeline = None
         retry = 0
-        while not timeline and retry < self.retries:
+        while not timeline and retry < self.get_tweets_retries:
             retry += 1
             timeline = self.api.GetUserTimeline(screen_name=screen_name, count=200)
         if not timeline:
@@ -48,7 +49,7 @@ class TwitterHelper:
         while True:
             tweets = None
             retry = 0
-            while not tweets and retry < self.retries:
+            while not tweets and retry < self.get_tweets_retries:
                 retry += 1
                 tweets = self.api.GetUserTimeline(screen_name=screen_name, max_id=earliest_tweet, count=200)
             if not tweets:
@@ -63,7 +64,7 @@ class TwitterHelper:
     def get_favorites(self, screen_name):
         retry = 0
         timeline = None
-        while not timeline and retry < self.retries:
+        while not timeline and retry < self.get_tweets_retries:
             retry += 1
             timeline = self.api.GetFavorites(screen_name=screen_name, count=200)
         if not timeline:
@@ -72,7 +73,7 @@ class TwitterHelper:
         while True:
             tweets = None
             retry = 0
-            while not tweets and retry < self.retries:
+            while not tweets and retry < self.get_tweets_retries:
                 retry += 1
                 tweets = self.api.GetFavorites(screen_name=screen_name, count=200, max_id=earliest_tweet)
             if not tweets:
@@ -85,4 +86,12 @@ class TwitterHelper:
         return timeline
 
     def get_user_info(self, screen_name):
-        return self.api.GetUser(screen_name=screen_name)
+        data = None
+        retry = 0
+        while data is None and retry < self.get_user_retries:
+            retry += 1
+            try:
+                data = self.api.GetUser(screen_name=screen_name)
+            except:
+                pass
+        return data
