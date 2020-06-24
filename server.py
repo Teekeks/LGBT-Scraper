@@ -21,7 +21,7 @@ import markupsafe
 import yaml
 
 
-VERSION = 'Version 0.3.1'
+VERSION = 'v0.3.1'
 
 
 class AccessLogger(AbstractAccessLogger):
