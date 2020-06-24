@@ -2,7 +2,7 @@
 	<div class="col s12">
 		<div class="card teal lighten-4">
 			<div class="card-content">
-				<span class="card-title"><b>{{ item.title }}</b></span>
+				<span class="card-title" id="{{ id }}"><b>{{ item.title }}</b> - <i>{{ item.date }}</i></span>
 				{% if item.description is defined %}
 				<p>
 					{{ item.description}}

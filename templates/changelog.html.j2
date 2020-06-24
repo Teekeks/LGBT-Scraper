@@ -3,7 +3,7 @@
 {% block content %}
 <h3>Changelog</h3>
 {% for hi in history %}
-	{% with item = history[hi] %}
+	{% with item = history[hi], id = hi %}
 		{% include "changelog_item.html.j2" %}
 	{% endwith %}
 {% endfor %}
