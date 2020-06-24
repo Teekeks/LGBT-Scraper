@@ -71,5 +71,7 @@ i.prefix {
 }
 
 .action-button {
-  padding-top: 20px;
+  padding-top: 15px;
+  padding-right: 4px;
+  color: #009688;
 }

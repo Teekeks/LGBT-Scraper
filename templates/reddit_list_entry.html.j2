@@ -6,6 +6,6 @@
 	<span class="title"><b>{{ comment.title }}</b><br/>
 		<b>/r/{{ comment.sub }}</b> | Score: {{ comment.score }} | {{ comment.days_since }}{% if comment.days_since != 'now' %} ago{% endif %}</span>
 	<p>{{ comment.body }}</p>
-	<a href="{{ comment.url }}" class="secondary-content  text-red action-button" target="_blank" rel="noopener noreferrer"><i class="material-icons">share</i></a>
+	<a href="{{ comment.url }}" class="secondary-content action-button" target="_blank" rel="noopener noreferrer"><i class="material-icons">read_more</i></a>
 	
 </li>

@@ -1,5 +1,8 @@
 <li class="collection-item {{ color_type }} lighten-3 avatar">
 	<i class="material-icons circle {{ color_type }} lighten-1">{% if comment.type == 'tweet' %}{% if comment.retweeted is defined %}repeat{% else %}comment{% endif %}{% else %}favorite{% endif %}</i>
+	{% for reason in comment.reason %}
+		<span class="new badge" data-badge-caption="{{ reason }}"></span>
+	{% endfor %}
 	<span class="title"><b>{% if comment.retweeted is defined %}RT @{{ comment.retweeted.user_name }} {% else %} @{{ user.name }} {% endif %}</b> | {{ comment.age }}{% if comment.age != 'now' %} ago{% endif %}</span>
 	<p>{{ comment.text }}</p>
 	{% if comment.quoted is defined %}
@@ -10,5 +13,5 @@
 			</div>
 		</div>
 	{% endif %}
-	<a href="{{ comment.url }}" class="secondary-content" target="_blank" rel="noopener noreferrer"><i class="material-icons">share</i></a>
+	<a href="{{ comment.url }}" class="secondary-content action-button" target="_blank" rel="noopener noreferrer"><i class="material-icons">read_more</i></a>
 </li>
