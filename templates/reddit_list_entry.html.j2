@@ -1,7 +1,11 @@
 <li class="collection-item {{ color_type }} lighten-3 avatar">
 	<i class="material-icons circle {{ color_type }} lighten-1">{% if comment.type == 'comment' %}comment{% else %}email{% endif %}</i>
+	{% for reason in comment.reason %}
+		<span class="new badge" data-badge-caption="{{ reason }}"></span>
+	{% endfor %}
 	<span class="title"><b>{{ comment.title }}</b><br/>
 		<b>/r/{{ comment.sub }}</b> | Score: {{ comment.score }} | {{ comment.days_since }}{% if comment.days_since != 'now' %} ago{% endif %}</span>
 	<p>{{ comment.body }}</p>
-	<a href="{{ comment.url }}" class="secondary-content" target="_blank" rel="noopener noreferrer"><i class="material-icons">share</i></a>
+	<a href="{{ comment.url }}" class="secondary-content  text-red action-button" target="_blank" rel="noopener noreferrer"><i class="material-icons">share</i></a>
+	
 </li>

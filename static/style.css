@@ -69,3 +69,7 @@ i.prefix {
 .twitter {
   background-color: #4fb5f4;/*#1DA1F2; */
 }
+
+.action-button {
+  padding-top: 20px;
+}

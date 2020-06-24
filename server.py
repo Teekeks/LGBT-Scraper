@@ -134,7 +134,7 @@ def get_date_since_str(date_str):
 
 
 def add_reason(data, reason):
-    if not hasattr(data, 'reason'):
+    if not 'reason' in data.keys():
         data['reason'] = []
     data['reason'].append(reason)
     return data
