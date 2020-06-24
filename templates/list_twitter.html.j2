@@ -33,13 +33,13 @@
 	<ul class="collection">
 		<li class="collection-item"><b>Profile Description:</b> {{ user.description }}</li>
 		<li class="collection-item"><b>Reach:</b> {{ "{:,}".format(user.followers_count) }} Followers, {{ "{:,}".format(user.friends_count) }} Friends</li>
-		<li class="collection-item"><b>Scraped Content:</b> {{ "{:,}".format(count_tweets + count_likes) }} out of {{ "{:,}".format(user.tweets_count + user.favourites_count) }} entries</li>
+		<li class="collection-item"><b>Scraped Content:</b> {{ "{:,}".format(count_tweets + count_likes) }} entries</li>
 	</ul>
 </div>
 <div id="detail_tab" class="col s12">
 	<ul class="collection">
-		<li class="collection-item"><b>Scraped Tweets:</b> {{ "{:,}".format(count_tweets) }} out of {{ "{:,}".format(user.tweets_count) }}</li>
-		<li class="collection-item"><b>Scraped Favorites:</b> {{ "{:,}".format(count_likes) }} out of {{ "{:,}".format(user.favourites_count) }} </li>
+		<li class="collection-item"><b>Scraped Tweets:</b> {{ "{:,}".format(count_tweets) }} out of {{ "{:,}".format(user.tweets_count) }} reported by Twitter</li>
+		<li class="collection-item"><b>Scraped Favorites:</b> {{ "{:,}".format(count_likes) }} out of {{ "{:,}".format(user.favourites_count) }} reported by Twitter</li>
 		<li class="collection-item"><b>LGBT+ Content:</b> {{ user.good|length }}</li>
 		<li class="collection-item"><b>Red flag Content:</b> {{ user.flag|length }}</li>
 		<li class="collection-item"><b>Processing Time:</b> {{ processing_time }}</li>

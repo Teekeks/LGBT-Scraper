@@ -8,3 +8,4 @@ v0.3.1:
     - fixed Twitter scraping sometimes failing on first try
   changed:
     - Retweets now have their own icon
+    - made the Twitter details a bit more clear
