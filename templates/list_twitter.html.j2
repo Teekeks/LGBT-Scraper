@@ -49,7 +49,7 @@
 <div class="row">
 	<div class="col s12">
 		<ul class="tabs">
-			<li class="tab col s6 green lighten-4"><a href="#lgbt_content" class="">LGBT+ related({{ user.good|length }})</a></li>
+			<li class="tab col s6 blue lighten-4"><a href="#lgbt_content" class="">LGBT+ related({{ user.good|length }})</a></li>
 			<li class="tab col s6 red lighten-4"><a href="#flag_content">Red flag ({{ user.flag|length }})</a></li>
 			<!-- <li class="tab col s4 blue lighten-4"><a href="#related_content">Related ({{ user.related|length }})</a></li> -->
 		</ul>
@@ -59,7 +59,7 @@
 <div id="lgbt_content" class="col s12">
 	<ul class="collection">
 		{% for comment in user.good %}
-			{% with color_type = 'green' %}
+			{% with color_type = 'blue' %}
 				{% include "twitter_list_entry.html.j2" %}
 			{% endwith %}
 		{% endfor %}
