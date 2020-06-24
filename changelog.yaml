@@ -1,11 +1,15 @@
 v0.3.1:
   title: Version 0.3.1
   date: 2020-06-24
-  description: Mostly small fixes
   added:
-    - Added Changelog
+    - Added this Changelog
+    - Added "Reason for Tag" badges (first itteration)
   fixed:
-    - fixed Twitter scraping sometimes failing on first try
+    - Fixed Twitter scraping sometimes failing on first try
+    - Fixed Reddit text rendering of &, < and > characters
   changed:
     - Retweets now have their own icon
-    - made the Twitter details a bit more clear
+    - Made the Twitter details a bit more clear
+    - Switched the twitter related color to blue to be more in line with the color signaling used by reddit scraping
+    - Changed the "go to original post" icon
+    - Made the "go to original post" icon more visible

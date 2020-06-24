@@ -139,6 +139,14 @@ def add_reason(data, reason):
     data['reason'].append(reason)
     return data
 
+
+def fix_reddit_text(text):
+    text = text.replace('&#x200B;', '')
+    text = text.replace('&amp;', '&')
+    text = text.replace('&lt;', '<')
+    text = text.replace('&gt;', '>')
+    return text
+
 # ======================================================================================================================
 # API Queries
 # ======================================================================================================================
@@ -169,7 +177,7 @@ def query_reddit(user):
             subname = comment.subreddit_name_prefixed[2:].lower()
             url = f'https://reddit.com{comment.permalink}?context=8&depth=9'
             c_data = {
-                    'body': comment.body.replace('&#x200B;', ''),
+                    'body': fix_reddit_text(comment.body),
                     'sub': comment.subreddit_name_prefixed[2:],
                     'score': comment.score,
                     'url': url,
@@ -195,7 +203,7 @@ def query_reddit(user):
             subname = post.subreddit_name_prefixed[2:].lower()
             url = post.shortlink
             p_data = {
-                'body': post.selftext,
+                'body': fix_reddit_text(post.selftext),
                 'sub': post.subreddit_name_prefixed[2:],
                 'score': post.score,
                 'url': url,
