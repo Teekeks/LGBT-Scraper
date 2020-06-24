@@ -1,5 +1,5 @@
 <li class="collection-item {{ color_type }} lighten-3 avatar">
-	<i class="material-icons circle {{ color_type }} lighten-1">{% if comment.type == 'tweet' %}comment{% else %}favorite{% endif %}</i>
+	<i class="material-icons circle {{ color_type }} lighten-1">{% if comment.type == 'tweet' %}{% if comment.retweeted is defined %}repeat{% else %}comment{% endif %}{% else %}favorite{% endif %}</i>
 	<span class="title"><b>{% if comment.retweeted is defined %}RT @{{ comment.retweeted.user_name }} {% else %} @{{ user.name }} {% endif %}</b> | {{ comment.age }}{% if comment.age != 'now' %} ago{% endif %}</span>
 	<p>{{ comment.text }}</p>
 	{% if comment.quoted is defined %}
