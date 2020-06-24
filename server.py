@@ -16,7 +16,12 @@ import re
 import twitter_helper as th
 from twitter.error import TwitterError
 from tag_reasons import *
+import markdown
+import markupsafe
+import yaml
 
+
+VERSION = 'Version 0.3.1'
 
 
 class AccessLogger(AbstractAccessLogger):
@@ -53,6 +58,15 @@ REMOVED_CHARS = re.compile(r'[.,:;!?+(){}<>\*\[\]]')
 TWITTER_PROFILE_URL_FIX = re.compile(r'_normal')
 
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
+
+
+md2html = markdown.Markdown(extensions=[
+    'markdown.extensions.fenced_code',
+    'markdown.extensions.tables',
+    'markdown.extensions.admonition',
+    'markdown.extensions.codehilite',
+    'markdown.extensions.sane_lists'
+])
 
 # ======================================================================================================================
 # Helpers
@@ -312,6 +326,10 @@ def query_twitter(user):
 # ======================================================================================================================
 
 
+def jinja2_filter_markdown(text):
+    return markupsafe.Markup(md2html.reset().convert(text))
+
+
 @aiohttp_jinja2.template('list_reddit.html.j2')
 async def handle_load_list_reddit(request):
     user = request.match_info['user_name']
@@ -382,9 +400,19 @@ async def handle_home(request):
         'factor_count': {
             'reddit': db_reddit.count_documents({}),
             'twitter': db_twitter.count_documents({})
-        }
+        },
+        'version': VERSION
     }
     return data
+
+
+@aiohttp_jinja2.template('changelog.html.j2')
+async def handle_changelog(request):
+    with open('changelog.yaml', 'r') as f:
+        data = yaml.safe_load(f)
+    return {'version': VERSION,
+            'history': data}
+
 
 # ======================================================================================================================
 # Service Startup
@@ -392,14 +420,17 @@ async def handle_home(request):
 
 
 app = web.Application()
-aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('templates'))
+aiohttp_jinja2.setup(app,
+                     loader=jinja2.FileSystemLoader('templates'),
+                     filters={'markdown': jinja2_filter_markdown})
 app.add_routes([web.get('/', handle_home),
                 web.get('/t/{user_name}', handle_twitter),
                 web.get('/twitter/{user_name}', handle_twitter),
                 web.get('/r/{user_name}', handle_reddit),
                 web.get('/reddit/{user_name}', handle_reddit),
                 web.get('/ajax/reddit/{user_name}', handle_load_list_reddit),
-                web.get('/ajax/twitter/{user_name}', handle_load_list_twitter)])
+                web.get('/ajax/twitter/{user_name}', handle_load_list_twitter),
+                web.get('/changelog', handle_changelog)])
 app.router.add_static('/static/',
                       path=str(path.join(path.dirname(__file__), 'static/')),
                       name='static')

@@ -1,0 +1,9 @@
+v0.3.1:
+  title: Version 0.3.1
+  description: Mostly small fixes
+  added:
+    - Added Changelog
+  fixed:
+    - fixed Twitter scraping sometimes failing on first try
+  changed:
+    - Retweets now have their own icon

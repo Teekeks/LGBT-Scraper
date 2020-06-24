@@ -35,7 +35,7 @@ class TwitterHelper:
             sleep_on_rate_limit=True
         )
         self.get_tweets_retries = 5
-        self.get_user_retries = 3
+        self.get_user_retries = 2
 
     def get_tweets(self, screen_name):
         timeline = None

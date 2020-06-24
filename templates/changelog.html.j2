@@ -1,0 +1,11 @@
+{% extends "base.html.j2" %}
+
+{% block content %}
+<h1>Changelog</h1>
+{% for hi in history %}
+	{% with item = history[hi] %}
+		{% include "changelog_item.html.j2" %}
+	{% endwith %}
+{% endfor %}
+
+{% endblock %}

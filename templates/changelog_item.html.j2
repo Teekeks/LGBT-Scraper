@@ -1,0 +1,60 @@
+<div class="row">
+	<div class="col s12">
+		<div class="card teal lighten-4">
+			<div class="card-content">
+				<span class="card-title"><b>{{ item.title }}</b></span>
+				{% if item.description is defined %}
+				<p>
+					{{ item.description}}
+				</p>
+				{% endif %}
+				<ul class="collection teal lighten-4">
+					{% if item.added is defined %}
+						<li class="collection-item avatar teal lighten-5">
+						<i class="material-icons circle green">add</i>
+						<span class="title"><b>Added</b></span>
+						<p>
+							{% for ia in item.added %}
+								+ {{ ia }}<br>
+							{% endfor %}
+						</p>
+						</li>
+					{% endif %}
+					{% if item.fixed is defined %}
+						<li class="collection-item avatar teal lighten-5">
+						<i class="material-icons circle orange">build</i>
+						<span class="title"><b>Fixed</b></span>
+						<p>
+							{% for ia in item.fixed %}
+								* {{ ia }}<br>
+							{% endfor %}
+						</p>
+						</li>
+					{% endif %}
+					{% if item.changed is defined %}
+						<li class="collection-item avatar teal lighten-5">
+						<i class="material-icons circle orange">repeat</i>
+						<span class="title"><b>Changed</b></span>
+						<p>
+							{% for ia in item.changed %}
+								* {{ ia }}<br>
+							{% endfor %}
+						</p>
+						</li>
+					{% endif %}
+					{% if item.removed is defined %}
+						<li class="collection-item avatar teal lighten-5">
+						<i class="material-icons circle red">delete</i>
+						<span class="title"><b>Removed</b></span>
+						<p>
+							{% for ia in item.removed %}
+								- {{ ia }}<br>
+							{% endfor %}
+						</p>
+						</li>
+					{% endif %}
+				</ul>
+			</div>
+		</div>
+	</div>	
+</div>
