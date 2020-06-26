@@ -8,6 +8,8 @@ v0.3.2:
   date: tba
   added:
     - Changelog now supports hiding future versions
+  changed:
+    - Switched order of "Related" and "Red Frag" tabs for Reddit scraping to be more in line with the logical order
 v0.3.1:
   title: Version 0.3.1
   date: 2020-06-24

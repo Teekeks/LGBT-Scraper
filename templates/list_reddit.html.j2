@@ -52,8 +52,8 @@
 	<div class="col s12">
 		<ul class="tabs">
 			<li class="tab col s4 green lighten-4"><a href="#lgbt_content" class="">LGBT+ ({{ user.good|length }})</a></li>
-			<li class="tab col s4 red lighten-4"><a href="#flag_content">Red flag ({{ user.flag|length }})</a></li>
 			<li class="tab col s4 blue lighten-4"><a href="#related_content">Related ({{ user.related|length }})</a></li>
+			<li class="tab col s4 red lighten-4"><a href="#flag_content">Red flag ({{ user.flag|length }})</a></li>
 		</ul>
 	</div>
 </div>
@@ -67,17 +67,6 @@
 		{% endfor %}
 	</ul>
 </div>
-
-<div id="flag_content" class="col s12">
-	<ul class="collection">
-		{% for comment in user.flag %}
-			{% with color_type = 'red' %}
-				{% include "reddit_list_entry.html.j2" %}
-			{% endwith %}
-		{% endfor %}
-	</ul>
-</div>
-
 <div id="related_content" class="col s12">
 	<ul class="collection">
 		{% for comment in user.related %}
@@ -87,5 +76,13 @@
 		{% endfor %}
 	</ul>
 </div>
-
+<div id="flag_content" class="col s12">
+	<ul class="collection">
+		{% for comment in user.flag %}
+			{% with color_type = 'red' %}
+				{% include "reddit_list_entry.html.j2" %}
+			{% endwith %}
+		{% endfor %}
+	</ul>
+</div>
 {% endif %}
