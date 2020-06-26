@@ -4,7 +4,9 @@
 <h3>Changelog</h3>
 {% for hi in history %}
 	{% with item = history[hi], id = hi %}
-		{% include "changelog_item.html.j2" %}
+		{% if item.future is not defined or not item.future %}
+			{% include "changelog_item.html.j2" %}
+		{% endif %}
 	{% endwith %}
 {% endfor %}
 
