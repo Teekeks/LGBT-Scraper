@@ -54,7 +54,7 @@ db = db_client[settings['mongodb']['db']]
 db_reddit = db['reddit']
 db_twitter = db['twitter']
 
-REMOVED_CHARS = re.compile(r'[.,:;!?+(){}<>\*\[\]]')
+REMOVED_CHARS = re.compile(r'[.,:;!?+(){}<>*[\]]')
 TWITTER_PROFILE_URL_FIX = re.compile(r'_normal')
 
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
@@ -75,7 +75,7 @@ md2html = markdown.Markdown(extensions=[
 
 def get_data(use_db):
     data = {}
-    for cat in ['red', 'green', 'related']:
+    for cat in [TC_RED_FLAG, TC_GREEN, TC_RELATED]:
         data[cat] = {
             'subs': [k.get('data') for k in use_db.find({'category': cat, 'type': 'subreddit'})],
             'words': [k.get('data') for k in use_db.find({'category': cat, 'type': 'word'})]
@@ -133,10 +133,14 @@ def get_date_since_str(date_str):
     return delta_str
 
 
-def add_reason(data, reason):
-    if not 'reason' in data.keys():
+def add_reason(data, reason, category):
+    if 'reason' not in data.keys():
         data['reason'] = []
-    data['reason'].append(reason)
+    d = {
+        'txt': reason,
+        'category': category
+    }
+    data['reason'].append(d)
     return data
 
 
@@ -166,9 +170,9 @@ def query_reddit(user):
             }}
         cat_data = get_data(db_reddit)
         c_ = {
-            'red': [],
-            'green': [],
-            'related': []
+            TC_RED_FLAG: [],
+            TC_GREEN: [],
+            TC_RELATED: []
         }
         c_t = 0
         p_t = 0
@@ -191,10 +195,10 @@ def query_reddit(user):
                 add = False
                 if subname in item['subs']:
                     add = True
-                    c_data = add_reason(c_data, REASON_SUBREDDIT)
+                    c_data = add_reason(c_data, REASON_SUBREDDIT, key)
                 if any(word in prep_body for word in item['words']):
                     add = True
-                    c_data = add_reason(c_data, REASON_WORD)
+                    c_data = add_reason(c_data, REASON_WORD, key)
                 if add:
                     c_[key].append(c_data)
 
@@ -217,10 +221,10 @@ def query_reddit(user):
                 add = False
                 if subname in item['subs']:
                     add = True
-                    p_data = add_reason(p_data, REASON_SUBREDDIT)
+                    p_data = add_reason(p_data, REASON_SUBREDDIT, key)
                 if any(word in prep_search for word in item['words']):
                     add = True
-                    p_data = add_reason(p_data, REASON_WORD)
+                    p_data = add_reason(p_data, REASON_WORD, key)
                 if add:
                     c_[key].append(p_data)
 
@@ -232,9 +236,9 @@ def query_reddit(user):
             'profile_pic': u.icon_img,
             'comment_karma': u.comment_karma,
             'link_karma': u.link_karma,
-            'good': c_['green'],
-            'flag': c_['red'],
-            'related': c_['related'],
+            'good': c_[TC_GREEN],
+            'flag': c_[TC_RED_FLAG],
+            'related': c_[TC_RELATED],
             'description': u.subreddit.get('public_description')
         }
         data['user'] = usr
@@ -297,21 +301,21 @@ def query_twitter(user):
         tweets, c_t, c_l = twitter_data(user)
         cat_data = get_data(db_twitter)
         c_ = {
-            'red': [],
-            'green': [],
-            'related': []
+            TC_RED_FLAG: [],
+            TC_GREEN: [],
+            TC_RELATED: []
         }
         for tweet in tweets:
             body = REMOVED_CHARS.sub(' ', tweet["full_text"].lower()).split()
             for key, item in cat_data.items():
                 if any(word in body for word in item['words']):
-                    tweet = add_reason(tweet, REASON_WORD)
+                    tweet = add_reason(tweet, REASON_WORD, key)
                     c_[key].append(tweet)
         usr = {
             'name': usr_d.screen_name,
-            'good': c_['green'],
-            'flag': c_['red'],
-            'related': c_['related'],
+            'good': c_[TC_GREEN],
+            'flag': c_[TC_RED_FLAG],
+            'related': c_[TC_RELATED],
             'account_age': get_date_since_str(th.to_datetime(usr_d.created_at)),
             'description': usr_d.description,
             'display_name': usr_d.name,

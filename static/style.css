@@ -75,3 +75,15 @@ i.prefix {
   padding-right: 4px;
   color: #009688;
 }
+
+.badge-red {
+  background-color: #EF5350 !important;
+}
+
+.badge-related {
+  background-color: #42A5F5 !important;
+}
+
+.badge-green {
+  background-color: #66BB6A !important;
+}
