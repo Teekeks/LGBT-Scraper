@@ -53,6 +53,7 @@ db_client = MongoClient(settings['mongodb']['host'], settings['mongodb']['port']
 db = db_client[settings['mongodb']['db']]
 db_reddit = db['reddit']
 db_twitter = db['twitter']
+db_log = db['log']
 
 REMOVED_CHARS = re.compile(r'[.,:;!?+(){}<>*[\]]')
 TWITTER_PROFILE_URL_FIX = re.compile(r'_normal')
@@ -151,12 +152,22 @@ def fix_reddit_text(text):
     text = text.replace('&gt;', '>')
     return text
 
+
+def save_log(log_data):
+    db_log.insert_one(log_data)
+
 # ======================================================================================================================
 # API Queries
 # ======================================================================================================================
 
 
 def query_reddit(user):
+    log_data = {
+        'timestamp': datetime.utcnow(),
+        'target': 'reddit',
+        'user': user,
+        'result': 'ok'
+    }
     start_time = datetime.utcnow()
     data = {}
     if user is not None:
@@ -165,9 +176,13 @@ def query_reddit(user):
         try:
             u.id
         except NotFound:
-            return {'error': {
-                'reason': 'User not found!'
-            }}
+            log_data['result'] = 'not_found'
+            save_log(log_data)
+            return {
+                'error': {
+                    'reason': 'User not found!'
+                }
+            }
         cat_data = get_data(db_reddit)
         c_ = {
             TC_RED_FLAG: [],
@@ -245,6 +260,15 @@ def query_reddit(user):
         data['processing_time'] = get_date_since_str(start_time)
         data['comment_count'] = c_t
         data['post_count'] = p_t
+        log_data['found'] = {
+            TC_GREEN: len(c_[TC_GREEN]),
+            TC_RELATED: len(c_[TC_RELATED]),
+            TC_RED_FLAG: len(c_[TC_RED_FLAG])
+        }
+    else:
+        log_data['result'] = 'not_found'
+    log_data['processing_time'] = (datetime.utcnow() - start_time).total_seconds()
+    save_log(log_data)
     return data
 
 
@@ -287,12 +311,20 @@ def twitter_data(user):
 
 
 def query_twitter(user):
+    log_data = {
+        'timestamp': datetime.utcnow(),
+        'target': 'twitter',
+        'user': user,
+        'result': 'ok'
+    }
     start_time = datetime.utcnow()
     data = {}
     if user is not None:
         try:
             usr_d = twitter.get_user_info(user)
         except TwitterError:
+            log_data['result'] = 'not_found'
+            save_log(log_data)
             return {
                 'error': {
                     'reason': 'User not found'
@@ -330,6 +362,15 @@ def query_twitter(user):
         data['count_tweets'] = c_t
         data['count_likes'] = c_l
         data['processing_time'] = get_date_since_str(start_time)
+        log_data['found'] = {
+            TC_GREEN: len(c_[TC_GREEN]),
+            TC_RELATED: len(c_[TC_RELATED]),
+            TC_RED_FLAG: len(c_[TC_RED_FLAG])
+        }
+    else:
+        log_data['result'] = 'not_found'
+    log_data['processing_time'] = (datetime.utcnow() - start_time).total_seconds()
+    save_log(log_data)
     return data
 
 
@@ -349,7 +390,8 @@ async def handle_load_list_reddit(request):
         completed, pending = await asyncio.wait([asyncio.get_event_loop().run_in_executor(executor, query_reddit, user)])
         results = [t.result() for t in completed]
         return results[0]
-    except:
+    except BaseException as e:
+        print(e)
         return {
             'error': {
                 'reason': 'An error occurred while trying to scrape the account. Please try again in a bit.'

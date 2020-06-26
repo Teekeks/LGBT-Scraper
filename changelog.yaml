@@ -7,10 +7,11 @@ v0.3.2:
   title: Version 0.3.2
   date: tba
   added:
-    - "Reason for Tag" badges now also show the category they belong to
+    - The "Reason for Tag" badges now also show the category they belong to
     - Changelog now supports hiding future versions
+    - Added Access logging to database
   fixed:
-    - "go to original post" link hitbox no longer overlaps with badges
+    - Fixed "go to original post" link hitbox overlaping with badges
   changed:
     - Switched order of "Related" and "Red Frag" tabs for Reddit scraping to be more in line with the logical order
 v0.3.1:
