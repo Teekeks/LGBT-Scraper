@@ -19,6 +19,7 @@ from tag_reasons import *
 import markdown
 import markupsafe
 import yaml
+import traceback
 
 
 VERSION = 'v0.3.2'
@@ -391,7 +392,17 @@ async def handle_load_list_reddit(request):
         results = [t.result() for t in completed]
         return results[0]
     except BaseException as e:
-        print(e)
+        log_data = {
+            'timestamp': datetime.utcnow(),
+            'user': user,
+            'target': 'reddit',
+            'result': 'exception',
+            'exception': {
+                'message': str(e),
+                'stack_trace': traceback.format_exc()
+            }
+        }
+        save_log(log_data)
         return {
             'error': {
                 'reason': 'An error occurred while trying to scrape the account. Please try again in a bit.'
@@ -401,12 +412,23 @@ async def handle_load_list_reddit(request):
 
 @aiohttp_jinja2.template('list_twitter.html.j2')
 async def handle_load_list_twitter(request):
+    user = request.match_info['user_name']
     try:
-        user = request.match_info['user_name']
         completed, pending = await asyncio.wait([asyncio.get_event_loop().run_in_executor(executor, query_twitter, user)])
         results = [t.result() for t in completed]
         return results[0]
-    except:
+    except BaseException as e:
+        log_data = {
+            'timestamp': datetime.utcnow(),
+            'user': user,
+            'target': 'twitter',
+            'result': 'exception',
+            'exception': {
+                'message': str(e),
+                'stack_trace': traceback.format_exc()
+            }
+        }
+        save_log(log_data)
         return {
             'error': {
                 'reason': 'An error occurred while trying to scrape the account. It might be set to private.'
