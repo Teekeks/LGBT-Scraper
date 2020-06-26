@@ -5,7 +5,7 @@ v0.4.0:
   description: The machine learns
 v0.3.2:
   title: Version 0.3.2
-  date: tba
+  date: 2020-06-27
   added:
     - The "Reason for Tag" badges now also show the category they belong to
     - Changelog now supports hiding future versions
