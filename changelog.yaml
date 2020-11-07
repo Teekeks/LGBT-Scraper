@@ -3,6 +3,11 @@ v0.4.0:
   date: tba
   future: True
   description: The machine learns
+v0.3.3:
+  title: Version 0.3.3
+  date: 2020-11-07
+  fixed:
+    - Fixed filtered words not being propperly picked up in hashtags and mentions for Twitter scraping
 v0.3.2:
   title: Version 0.3.2
   date: 2020-06-27
