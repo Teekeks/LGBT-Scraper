@@ -58,7 +58,7 @@
 
 <div id="lgbt_content" class="col s12">
 	<ul class="collection">
-		{% for comment in user.good %}
+		{% for comment in user.related %}
 			{% with color_type = 'blue' %}
 				{% include "twitter_list_entry.html.j2" %}
 			{% endwith %}

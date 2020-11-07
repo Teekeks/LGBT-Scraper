@@ -56,7 +56,7 @@ db_reddit = db['reddit']
 db_twitter = db['twitter']
 db_log = db['log']
 
-REMOVED_CHARS = re.compile(r'[.,:;!?+(){}<>*[\]]')
+REMOVED_CHARS = re.compile(r'[.,:;!?+(){}<>*#@[\]]')
 TWITTER_PROFILE_URL_FIX = re.compile(r'_normal')
 
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
@@ -252,9 +252,9 @@ def query_reddit(user):
             'profile_pic': u.icon_img,
             'comment_karma': u.comment_karma,
             'link_karma': u.link_karma,
-            'good': c_[TC_GREEN],
-            'flag': c_[TC_RED_FLAG],
-            'related': c_[TC_RELATED],
+            TC_GREEN: c_[TC_GREEN],
+            TC_RED_FLAG: c_[TC_RED_FLAG],
+            TC_RELATED: c_[TC_RELATED],
             'description': u.subreddit.get('public_description')
         }
         data['user'] = usr
@@ -346,9 +346,9 @@ def query_twitter(user):
                     c_[key].append(tweet)
         usr = {
             'name': usr_d.screen_name,
-            'good': c_[TC_GREEN],
-            'flag': c_[TC_RED_FLAG],
-            'related': c_[TC_RELATED],
+            TC_GREEN: c_[TC_GREEN],
+            TC_RED_FLAG: c_[TC_RED_FLAG],
+            TC_RELATED: c_[TC_RELATED],
             'account_age': get_date_since_str(th.to_datetime(usr_d.created_at)),
             'description': usr_d.description,
             'display_name': usr_d.name,
