@@ -11,6 +11,11 @@
 					<p>
 						The {{search[0]|upper}}{{search[1:]}} Username "<b>{{data}}</b>" seems to not follow a recognizable Username format.
 					</p>
+				{% elif reason == "404-not-found" %}
+					<span class="card-title"><b>Could not find the thing you where looking for :(</b></span>
+					<p>
+						Seems like I cant find <b>{{data}}</b>, I am sorry about that.<br><br>
+					</p>
 				{% else %}
 					<span class="card-title"><b>An Error occured</b></span>
 					<p>
@@ -27,7 +32,7 @@
 	<div class="col s12">
 		<div class="card teal lighten-4">
 			<div class="card-content">
-				<span class="card-title"><b>Examples for valid Reddit Usernames formats</b></span>
+				<span class="card-title"><b>Examples for valid Reddit usernames formats</b></span>
 				<p>
 					Teekeks<br>
 					/u/Teekeks<br>
@@ -45,7 +50,7 @@
 	<div class="col s12">
 		<div class="card teal lighten-4">
 			<div class="card-content">
-				<span class="card-title"><b>Examples for valid Twitter Usernames formats</b></span>
+				<span class="card-title"><b>Examples for valid Twitter usernames formats</b></span>
 				<p>
 					Teekeks<br>
 					@Teekeks<br>

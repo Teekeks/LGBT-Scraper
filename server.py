@@ -502,12 +502,30 @@ async def handle_error_page(request):
             'data': request.query.get('data', '')}
 
 
+@aiohttp_jinja2.template('error.html.j2')
+async def show_error_page(reason, data, request):
+    return {'reason': reason,
+            'data': data}
+
+
+@web.middleware
+async def error_middleware(request, handler):
+    try:
+        response = await handler(request)
+        if response.status != 404:
+            return response
+    except web.HTTPException as ex:
+        if ex.status != 404:
+            raise
+    return await show_error_page('404-not-found', request.path_qs, request)
+
+
 # ======================================================================================================================
 # Service Startup
 # ======================================================================================================================
 
 
-app = web.Application()
+app = web.Application(middlewares=[error_middleware])
 aiohttp_jinja2.setup(app,
                      loader=jinja2.FileSystemLoader('templates'),
                      filters={'markdown': jinja2_filter_markdown})
