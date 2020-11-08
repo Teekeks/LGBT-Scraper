@@ -22,7 +22,9 @@ import yaml
 import traceback
 
 
-VERSION = 'v0.3.2'
+VERSION = 'v0.3.4'
+USERNAME_REDDIT = re.compile(r'(?:^|/u/|https://reddit\.com/u/)([A-Za-z0-9_-]+)$')
+
 
 
 class AccessLogger(AbstractAccessLogger):
@@ -444,16 +446,19 @@ async def handle_show_settings(request):
     }
 
 
+
 @aiohttp_jinja2.template('reddit.html.j2')
 async def handle_reddit(request):
     user_name = request.match_info['user_name']
     data = {}
     if user_name is not None and len(user_name) > 0:
-        username = user_name.strip()
-        usr = {
-            'name': username,
-        }
-        data['user'] = usr
+        username = USERNAME_REDDIT.findall(user_name.strip())
+        if len(username) > 0:
+            username = username[0]
+            usr = {
+                'name': username,
+            }
+            data['user'] = usr
     return data
 
 
@@ -490,6 +495,13 @@ async def handle_changelog(request):
             'history': data}
 
 
+@aiohttp_jinja2.template('error.html.j2')
+async def handle_error_page(request):
+    return {'search': request.query.get('search', '???'),
+            'reason': request.query.get('reason', 'unknown'),
+            'data': request.query.get('data', '')}
+
+
 # ======================================================================================================================
 # Service Startup
 # ======================================================================================================================
@@ -506,7 +518,8 @@ app.add_routes([web.get('/', handle_home),
                 web.get('/reddit/{user_name}', handle_reddit),
                 web.get('/ajax/reddit/{user_name}', handle_load_list_reddit),
                 web.get('/ajax/twitter/{user_name}', handle_load_list_twitter),
-                web.get('/changelog', handle_changelog)])
+                web.get('/changelog', handle_changelog),
+                web.get('/error/', handle_error_page)])
 app.router.add_static('/static/',
                       path=str(path.join(path.dirname(__file__), 'static/')),
                       name='static')

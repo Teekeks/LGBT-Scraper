@@ -3,15 +3,25 @@
 function actionReddit(){
 	var action_src = $("#uReddit").val();
 	var urlLink = "/reddit/";
-	urlLink = urlLink + action_src;
-	window.location = urlLink;
+	var found = action_src.match(/(?:^|\/u\/|https:\/\/reddit\.com\/u\/)([A-Za-z0-9_-]+)(?:\/)?$/i);
+	if (!found) {
+	    urlLink = "/error/?search=reddit&reason=invalid-username&data="+encodeURIComponent(action_src);
+    } else {
+        urlLink = urlLink + found[1];
+    }
+    window.location = urlLink;
 	return false;
 }
 
 function actionTwitter(){
 	var action_src = $("#uTwitter").val();
 	var urlLink = "/twitter/";
-	urlLink = urlLink + action_src;
+	var found = action_src.match(/^(?:https:\/\/twitter\.com\/)?(?:#!\/)?(?:@)?([A-Za-z0-9_]{4,15})(?:\/)?$/i);
+	if (!found) {
+	    urlLink = "/error/?search=twitter&reason=invalid-username&data="+encodeURIComponent(action_src);
+	} else {
+	    urlLink = urlLink + found[1];
+	}
 	window.location = urlLink;
 	return false;
 }

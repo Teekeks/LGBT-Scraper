@@ -15,3 +15,12 @@ You need a MongoDB database, a Reddit Bot and a Twitter API access, it is also r
 Rename the settings.example.json to settings.json and fill in all required data.
 
 Start it with ``python3.8 ./server.py``
+
+## TODO
+
+### certain
+
+* Regex based account name matching
+* display of tagged words
+* tumblr scraping
+
