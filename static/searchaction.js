@@ -3,7 +3,7 @@
 function actionReddit(){
 	var action_src = $("#uReddit").val();
 	var urlLink = "/reddit/";
-	var found = action_src.match(/(?:^|\/u\/|https:\/\/reddit\.com\/u\/)([A-Za-z0-9_-]+)(?:\/)?$/i);
+	var found = action_src.match(/(?:^|\/u\/|https:\/\/(?:www\.)?reddit\.com\/u(?:ser)?\/)([A-Za-z0-9_-]+)(?:\/)?$/i);
 	if (!found) {
 	    urlLink = "/error/?search=reddit&reason=invalid-username&data="+encodeURIComponent(action_src);
     } else {

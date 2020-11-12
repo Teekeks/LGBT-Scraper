@@ -5,13 +5,15 @@ v0.4.0:
   description: The machine learns
 v0.3.4:
   title: Version 0.3.4
-  date: 2020-11-08
+  date: 2020-11-12
   added:
     - You can now copy full URLs to profiles in the search fields
     - Usernames can now include the platform typical prefixes (/u/ for Reddit, @ for Twitter)
     - Added validation for Twitter and Reddit Usernames
   changed:
     - Now displays propper error page for certain errors
+  fixed:
+    - fixed Twitter scraping not displaying found content propperly
 v0.3.3:
   title: Version 0.3.3
   date: 2020-11-07
