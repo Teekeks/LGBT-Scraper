@@ -41,8 +41,8 @@
 		<li class="collection-item"><b>Link Karma:</b> {{ user.link_karma }}</li>
 		<li class="collection-item"><b>Scraped Comments:</b> {{ comment_count }}</li>
 		<li class="collection-item"><b>Scraped Posts:</b> {{ post_count }}</li>
-		<li class="collection-item"><b>LGBT+ Content:</b> {{ user.good|length }}</li>
-		<li class="collection-item"><b>Red flag Content:</b> {{ user.flag|length }}</li>
+		<li class="collection-item"><b>LGBT+ Content:</b> {{ user.green|length }}</li>
+		<li class="collection-item"><b>Red flag Content:</b> {{ user.red|length }}</li>
 		<li class="collection-item"><b>Related Content:</b> {{ user.related|length }}</li>
 		<li class="collection-item"><b>Processing Time:</b> {{ processing_time }}</li>
 	</ul>
@@ -60,7 +60,7 @@
 
 <div id="lgbt_content" class="col s12">
 	<ul class="collection">
-		{% for comment in user.good %}
+		{% for comment in user.green %}
 			{% with color_type = 'green' %}
 				{% include "reddit_list_entry.html.j2" %}
 			{% endwith %}
@@ -78,7 +78,7 @@
 </div>
 <div id="flag_content" class="col s12">
 	<ul class="collection">
-		{% for comment in user.flag %}
+		{% for comment in user.red %}
 			{% with color_type = 'red' %}
 				{% include "reddit_list_entry.html.j2" %}
 			{% endwith %}
