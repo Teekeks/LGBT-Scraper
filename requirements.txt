@@ -6,3 +6,4 @@ python-dateutil
 python-twitter
 markdown
 pyYAML
+pytumblr

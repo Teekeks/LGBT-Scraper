@@ -4,3 +4,5 @@ settings.json
 access.log
 /__pycache__/
 *.pyc
+/tools/tumblr_playfield.py
+/dump.json

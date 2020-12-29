@@ -14,6 +14,7 @@ api = twitter.Api(
             tweet_mode='extended'
         )
 
-data = api.GetStatus(status_id=1268361411266256897)
-print(json.dumps(data._json))
+data = api.GetFavorites(screen_name="AT_2ndAcc", count=200)  # GetStatus(status_id=1268361411266256897)
+for dat in data:
+    print(json.dumps(dat._json))
 
