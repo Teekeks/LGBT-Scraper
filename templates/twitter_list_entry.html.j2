@@ -1,7 +1,7 @@
 <li class="collection-item {{ color_type }} lighten-3 avatar">
 	<i class="material-icons circle {{ color_type }} lighten-1">{% if comment.type == 'tweet' %}{% if comment.retweeted is defined %}repeat{% else %}comment{% endif %}{% else %}favorite{% endif %}</i>
 	{% for reason in comment.reason %}
-		<span class="new badge badge-{{ reason.category}}" data-badge-caption="{{ reason.txt }}"></span>
+		<span class="new badge badge-{{ reason.category}}" data-badge-caption="{{reason.data}}"></span>
 	{% endfor %}
 	<span class="title"><b>{% if comment.retweeted is defined %}RT @{{ comment.retweeted.user_name }} {% else %} @{{ user.name }} {% endif %}</b> | {{ comment.age }}{% if comment.age != 'now' %} ago{% endif %}</span>
 	<p>{{ comment.text }}</p>

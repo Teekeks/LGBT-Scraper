@@ -137,12 +137,13 @@ def get_date_since_str(date_str):
     return delta_str
 
 
-def add_reason(data, reason, category):
+def add_reason(data, reason, category, found_data):
     if 'reason' not in data.keys():
         data['reason'] = []
     d = {
         'txt': reason,
-        'category': category
+        'category': category,
+        'data': found_data
     }
     data['reason'].append(d)
     return data
@@ -213,10 +214,11 @@ def query_reddit(user):
                 add = False
                 if subname in item['subs']:
                     add = True
-                    c_data = add_reason(c_data, REASON_SUBREDDIT, key)
-                if any(word in prep_body for word in item['words']):
-                    add = True
-                    c_data = add_reason(c_data, REASON_WORD, key)
+                    c_data = add_reason(c_data, REASON_SUBREDDIT, key, subname)
+                for word in item['words']:
+                    if word in prep_body:
+                        add = True
+                        c_data = add_reason(c_data, REASON_WORD, key, word)
                 if add:
                     c_[key].append(c_data)
 
@@ -239,10 +241,11 @@ def query_reddit(user):
                 add = False
                 if subname in item['subs']:
                     add = True
-                    p_data = add_reason(p_data, REASON_SUBREDDIT, key)
-                if any(word in prep_search for word in item['words']):
-                    add = True
-                    p_data = add_reason(p_data, REASON_WORD, key)
+                    p_data = add_reason(p_data, REASON_SUBREDDIT, key, subname)
+                for word in item['words']:
+                    if word in prep_search:
+                        add = True
+                        p_data = add_reason(p_data, REASON_WORD, key, word)
                 if add:
                     c_[key].append(p_data)
 
@@ -343,9 +346,10 @@ def query_twitter(user):
         for tweet in tweets:
             body = REMOVED_CHARS.sub(' ', tweet["full_text"].lower()).split()
             for key, item in cat_data.items():
-                if any(word in body for word in item['words']):
-                    tweet = add_reason(tweet, REASON_WORD, key)
-                    c_[key].append(tweet)
+                for word in item['words']:
+                    if word in body:
+                        tweet = add_reason(tweet, REASON_WORD, key, word)
+                        c_[key].append(tweet)
         usr = {
             'name': usr_d.screen_name,
             TC_GREEN: c_[TC_GREEN],

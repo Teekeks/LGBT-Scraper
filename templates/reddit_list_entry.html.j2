@@ -1,7 +1,7 @@
 <li class="collection-item {{ color_type }} lighten-3 avatar">
 	<i class="material-icons circle {{ color_type }} lighten-1">{% if comment.type == 'comment' %}comment{% else %}email{% endif %}</i>
 	{% for reason in comment.reason %}
-		<span class="new badge badge-{{ reason.category}}" data-badge-caption="{{ reason.txt }}"></span>
+		<span class="new badge badge-{{ reason.category}}" data-badge-caption="{% if reason.txt == 'word' %}{{reason.data}}{% else %}/r/{{reason.data}}{% endif %}"></span>
 	{% endfor %}
 	<span class="title"><b>{{ comment.title }}</b><br/>
 		<b>/r/{{ comment.sub }}</b> | Score: {{ comment.score }} | {{ comment.days_since }}{% if comment.days_since != 'now' %} ago{% endif %}</span>
