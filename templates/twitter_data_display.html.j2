@@ -1,0 +1,49 @@
+{% extends "base.html.j2" %}
+
+{% block content %}
+<div class="row">
+	<div class="col s12">
+		<div class="card teal lighten-4">
+			<div class="card-content">
+				<span class="card-title"><b>Twitter scraper flags</b></span>
+				<p>
+					This is a list of all the flags used by the scraper.
+				</p>
+			</div>
+		</div>
+	</div>	
+</div>
+<div class="row">
+	<div class="col s12">
+		<ul class="tabs">
+			<li class="tab col s6 blue lighten-4"><a href="#related_content">Related ({{ related|length }})</a></li>
+			<li class="tab col s6 red lighten-4"><a href="#flag_content">Red flag ({{ red|length }})</a></li>
+		</ul>
+	</div>
+</div>
+<div id="related_content" class="col s12">
+	<ul class="collection">
+		{% for data in related %}
+			{% with color_type = 'blue' %}
+				<li class="collection-item {{ color_type }} lighten-3">
+					<b>{{ data.data }}</b>
+				</li>
+			{% endwith %}
+		{% endfor %}
+	</ul>
+</div>
+<div id="flag_content" class="col s12">
+	<ul class="collection">
+		{% for data in red %}
+			{% with color_type = 'red' %}
+				<li class="collection-item {{ color_type }} lighten-3">
+					<b>{{ data.data }}</b>
+				</li>
+			{% endwith %}
+		{% endfor %}
+	</ul>
+</div>
+<script type="text/javascript">
+	$('.tabs').tabs();
+</script>
+{% endblock %}

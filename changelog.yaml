@@ -3,6 +3,14 @@ v0.4.0:
   date: tba
   future: True
   description: The machine learns
+v0.3.5:
+  title: Version 0.3.5
+  date: 2020-12-29
+  added:
+    - List of all flags used by the scraper (/data/reddit and /data/twitter)
+  changed:
+    - The "Reason for Tag" badge now displays the exact keyword / subreddit it got triggered by
+    - Improved the automatic extraction of Twitter and Reddit usernames from URLs in the search bar
 v0.3.4:
   title: Version 0.3.4
   date: 2020-11-12

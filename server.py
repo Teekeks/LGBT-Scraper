@@ -22,9 +22,8 @@ import yaml
 import traceback
 
 
-VERSION = 'v0.3.4'
+VERSION = 'v0.3.5'
 USERNAME_REDDIT = re.compile(r'(?:^|/u/|https://reddit\.com/u/)([A-Za-z0-9_-]+)$')
-
 
 
 class AccessLogger(AbstractAccessLogger):
@@ -499,6 +498,29 @@ async def handle_changelog(request):
             'history': data}
 
 
+@aiohttp_jinja2.template('reddit_data_display.html.j2')
+async def handle_get_reddit_data(request):
+    data = db_reddit.find({'category': {'$ne': 'unrelated'}}).sort('data', 1)
+    fd = {TC_GREEN: [],
+          TC_RELATED: [],
+          TC_RED_FLAG: []}
+    for d in data:
+        fd.get(d.get('category')).append({'data': d.get('data'),
+                                          'type': d.get('type')})
+    return fd
+
+
+@aiohttp_jinja2.template('twitter_data_display.html.j2')
+async def handle_get_twitter_data(request):
+    data = db_twitter.find({'category': {'$ne': 'unrelated'}}).sort('data', 1)
+    fd = {TC_GREEN: [],
+          TC_RELATED: [],
+          TC_RED_FLAG: []}
+    for d in data:
+        fd.get(d.get('category')).append({'data': d.get('data'),
+                                          'type': d.get('type')})
+    return fd
+
 @aiohttp_jinja2.template('error.html.j2')
 async def handle_error_page(request):
     return {'search': request.query.get('search', '???'),
@@ -541,6 +563,8 @@ app.add_routes([web.get('/', handle_home),
                 web.get('/ajax/reddit/{user_name}', handle_load_list_reddit),
                 web.get('/ajax/twitter/{user_name}', handle_load_list_twitter),
                 web.get('/changelog', handle_changelog),
+                web.get('/data/reddit', handle_get_reddit_data),
+                web.get('/data/twitter', handle_get_twitter_data),
                 web.get('/error/', handle_error_page)])
 app.router.add_static('/static/',
                       path=str(path.join(path.dirname(__file__), 'static/')),
