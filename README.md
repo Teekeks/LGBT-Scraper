@@ -20,7 +20,5 @@ Start it with ``python3.8 ./server.py``
 
 ### certain
 
-* Regex based account name matching
-* display of tagged words
 * tumblr scraping
 
