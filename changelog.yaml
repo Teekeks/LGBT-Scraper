@@ -3,6 +3,11 @@ v0.4.0:
   date: tba
   future: True
   description: The machine learns
+v0.3.6:
+  title: Version 0.3.6
+  date: 2021-01-30
+  added:
+    - Added opengraph tags for link preview in discord
 v0.3.5:
   title: Version 0.3.5
   date: 2020-12-29
